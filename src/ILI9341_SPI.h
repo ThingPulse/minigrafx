@@ -124,35 +124,18 @@ class Adafruit_ILI9341 : public DisplayDriver {
 
   void init(void);
   void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
-  void pushColor(uint16_t color);
-  void fillScreen(uint16_t color);
-  void drawPixel(int16_t x, int16_t y, uint16_t color);
-  void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
-  void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
-  void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
   void setRotation(uint8_t r);
-  void invertDisplay(boolean i);
-  uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
-
 
   void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette);
   uint16_t getScreenWidth();
   uint16_t getScreenHeight();
 
-  /* These are not for current use, 8-bit protocol only! */
-  uint8_t  readdata(void),
-    readcommand8(uint8_t reg, uint8_t index = 0);
-  /*
-  uint16_t readcommand16(uint8_t);
-  uint32_t readcommand32(uint8_t);
-  void     dummyclock(void);
-  */
 
   void spiwrite(uint8_t);
   void writecommand(uint8_t c);
   void writedata(uint8_t d);
   void commandList(uint8_t *addr);
-  uint8_t  spiread(void);
+
 
  private:
 
@@ -160,25 +143,9 @@ class Adafruit_ILI9341 : public DisplayDriver {
 
 
   boolean  hwSPI;
-#if defined (__AVR__) || defined(TEENSYDUINO)
-  uint8_t mySPCR;
-  volatile uint8_t *mosiport, *clkport, *dcport, *rsport, *csport;
-  int8_t  _cs, _dc, _rst, _mosi, _miso, _sclk;
-  uint8_t  mosipinmask, clkpinmask, cspinmask, dcpinmask;
-////This def is for the Arduino.ORG M0!!!
-//#elif defined(ARDUINO_SAM_ZERO)
-//    volatile PORT_OUT_Type *mosiport, *clkport, *dcport, *rsport, *csport;
-//    int32_t  _cs, _dc, _rst, _mosi, _miso, _sclk;
-//    PORT_OUT_Type  mosipinmask, clkpinmask, cspinmask, dcpinmask;
-#elif defined (__arm__)
-    volatile RwReg *mosiport, *clkport, *dcport, *rsport, *csport;
-    int32_t  _cs, _dc, _rst, _mosi, _miso, _sclk;
-    uint32_t  mosipinmask, clkpinmask, cspinmask, dcpinmask;
-#elif defined (ESP8266) || defined (ESP32)
-    int32_t  _cs, _dc, _rst, _mosi, _miso, _sclk;
-#else
-    int8_t  _cs, _dc, _rst, _mosi, _miso, _sclk;
-#endif
+
+  int32_t  _cs, _dc, _rst, _mosi, _miso, _sclk;
+
 };
 
 #endif
