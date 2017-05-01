@@ -26,7 +26,7 @@ uint16_t palette[] = {ILI9341_BLACK,
                       ILI9341_MAGENTA,
                       ILI9341_YELLOW};
 #define BITS_PER_PIXEL 4
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+ILI9341_SPI tft = ILI9341_SPI(TFT_CS, TFT_DC);
 MiniGrafx gfx = MiniGrafx(&tft, 240, 320, BITS_PER_PIXEL, palette);
 char iconMap[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O' };
 

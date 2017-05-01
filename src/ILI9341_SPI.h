@@ -114,13 +114,13 @@
 #define BITS_PER_PIXEL 4
 #define PALETTE_COLORS 16
 
-class Adafruit_ILI9341 : public DisplayDriver {
+class ILI9341_SPI : public DisplayDriver {
 
  public:
 
-  Adafruit_ILI9341(int8_t _CS, int8_t _DC, int8_t _MOSI, int8_t _SCLK,
+  ILI9341_SPI(int8_t _CS, int8_t _DC, int8_t _MOSI, int8_t _SCLK,
        int8_t _RST, int8_t _MISO);
-  Adafruit_ILI9341(int8_t _CS, int8_t _DC, int8_t _RST = -1);
+  ILI9341_SPI(int8_t _CS, int8_t _DC, int8_t _RST = -1);
 
   void init(void);
   void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);

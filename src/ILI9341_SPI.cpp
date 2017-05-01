@@ -55,7 +55,7 @@ static inline void spi_end(void) {
 
 
 // Constructor when using software SPI.  All output pins are configurable.
-Adafruit_ILI9341::Adafruit_ILI9341(int8_t cs, int8_t dc, int8_t mosi,
+ILI9341_SPI::ILI9341_SPI(int8_t cs, int8_t dc, int8_t mosi,
            int8_t sclk, int8_t rst, int8_t miso) : DisplayDriver(ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT) {
   _cs   = cs;
   _dc   = dc;
@@ -69,7 +69,7 @@ Adafruit_ILI9341::Adafruit_ILI9341(int8_t cs, int8_t dc, int8_t mosi,
 
 // Constructor when using hardware SPI.  Faster, but must use SPI pins
 // specific to each board type (e.g. 11,13 for Uno, 51,52 for Mega, etc.)
-Adafruit_ILI9341::Adafruit_ILI9341(int8_t cs, int8_t dc, int8_t rst) : DisplayDriver(ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT) {
+ILI9341_SPI::ILI9341_SPI(int8_t cs, int8_t dc, int8_t rst) : DisplayDriver(ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT) {
   _cs   = cs;
   _dc   = dc;
   _rst  = rst;
@@ -77,7 +77,7 @@ Adafruit_ILI9341::Adafruit_ILI9341(int8_t cs, int8_t dc, int8_t rst) : DisplayDr
   _mosi  = _sclk = 0;
 }
 
-void Adafruit_ILI9341::spiwrite(uint8_t c) {
+void ILI9341_SPI::spiwrite(uint8_t c) {
 
   //Serial.print("0x"); Serial.print(c, HEX); Serial.print(", ");
 
@@ -126,7 +126,7 @@ void Adafruit_ILI9341::spiwrite(uint8_t c) {
 }
 
 
-void Adafruit_ILI9341::writecommand(uint8_t c) {
+void ILI9341_SPI::writecommand(uint8_t c) {
 #if defined (USE_FAST_PINIO)
   *dcport &= ~dcpinmask;
   *csport &= ~cspinmask;
@@ -146,7 +146,7 @@ void Adafruit_ILI9341::writecommand(uint8_t c) {
 }
 
 
-void Adafruit_ILI9341::writedata(uint8_t c) {
+void ILI9341_SPI::writedata(uint8_t c) {
 #if defined (USE_FAST_PINIO)
   *dcport |=  dcpinmask;
   *csport &= ~cspinmask;
@@ -175,7 +175,7 @@ void Adafruit_ILI9341::writedata(uint8_t c) {
 
 // Companion code to the above tables.  Reads and issues
 // a series of LCD commands stored in PROGMEM byte array.
-void Adafruit_ILI9341::commandList(uint8_t *addr) {
+void ILI9341_SPI::commandList(uint8_t *addr) {
 
   uint8_t  numCommands, numArgs;
   uint16_t ms;
@@ -199,7 +199,7 @@ void Adafruit_ILI9341::commandList(uint8_t *addr) {
 }
 
 
-void Adafruit_ILI9341::init(void) {
+void ILI9341_SPI::init(void) {
   if (_rst > 0) {
     pinMode(_rst, OUTPUT);
     digitalWrite(_rst, LOW);
@@ -255,19 +255,6 @@ void Adafruit_ILI9341::init(void) {
     delay(150);
   }
 
-  /*
-  uint8_t x = readcommand8(ILI9341_RDMODE);
-  Serial.print("\nDisplay Power Mode: 0x"); Serial.println(x, HEX);
-  x = readcommand8(ILI9341_RDMADCTL);
-  Serial.print("\nMADCTL Mode: 0x"); Serial.println(x, HEX);
-  x = readcommand8(ILI9341_RDPIXFMT);
-  Serial.print("\nPixel Format: 0x"); Serial.println(x, HEX);
-  x = readcommand8(ILI9341_RDIMGFMT);
-  Serial.print("\nImage Format: 0x"); Serial.println(x, HEX);
-  x = readcommand8(ILI9341_RDSELFDIAG);
-  Serial.print("\nSelf Diagnostic: 0x"); Serial.println(x, HEX);
-*/
-  //if(cmdList) commandList(cmdList);
 
   if (hwSPI) spi_begin();
   writecommand(0xEF);
@@ -383,7 +370,7 @@ void Adafruit_ILI9341::init(void) {
 }
 
 
-void Adafruit_ILI9341::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1,
+void ILI9341_SPI::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1,
  uint16_t y1) {
 
   writecommand(ILI9341_CASET); // Column addr set
@@ -411,7 +398,7 @@ void Adafruit_ILI9341::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1,
 #define MADCTL_BGR 0x08
 #define MADCTL_MH  0x04
 
-void Adafruit_ILI9341::setRotation(uint8_t m) {
+void ILI9341_SPI::setRotation(uint8_t m) {
 
   if (hwSPI) spi_begin();
   writecommand(ILI9341_MADCTL);
@@ -441,7 +428,7 @@ void Adafruit_ILI9341::setRotation(uint8_t m) {
   if (hwSPI) spi_end();
 }
 
-void Adafruit_ILI9341::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) {
+void ILI9341_SPI::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) {
 
     if (hwSPI) spi_begin();
     setAddrWindow(0, 0, _width - 1, _height -1 );
@@ -486,9 +473,9 @@ void Adafruit_ILI9341::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16
     if (hwSPI) spi_end();
 }
 
-uint16_t Adafruit_ILI9341::getScreenWidth() {
+uint16_t ILI9341_SPI::getScreenWidth() {
   return ILI9341_TFTWIDTH;
 }
-uint16_t Adafruit_ILI9341::getScreenHeight() {
+uint16_t ILI9341_SPI::getScreenHeight() {
   return ILI9341_TFTHEIGHT;
 }
