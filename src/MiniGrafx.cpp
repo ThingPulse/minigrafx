@@ -1,7 +1,7 @@
 
 #include "MiniGrafx.h"
 
-MiniGrafx::MiniGrafx(Adafruit_ILI9341 *driver, uint16_t width, uint16_t height, uint8_t bitsPerPixel, uint16_t *palette) {
+MiniGrafx::MiniGrafx(DisplayDriver *driver, uint16_t width, uint16_t height, uint8_t bitsPerPixel, uint16_t *palette) {
   this->driver = driver;
   this->width = width;
   this->height = height;
@@ -23,7 +23,7 @@ MiniGrafx::MiniGrafx(Adafruit_ILI9341 *driver, uint16_t width, uint16_t height, 
     case 4:
       this->bitShift = 1;
       break;
-    case 8: 
+    case 8:
       this->bitShift = 0;
       break;
   }
@@ -33,6 +33,10 @@ MiniGrafx::MiniGrafx(Adafruit_ILI9341 *driver, uint16_t width, uint16_t height, 
     Serial.println("[DEBUG_MINI_GRAFX][init] Not enough memory to create display\n");
   }
   this->palette = palette;
+}
+
+void MiniGrafx::init() {
+  this->driver->init();
 }
 
 void MiniGrafx::setColor(uint16_t color) {
@@ -355,7 +359,7 @@ void inline MiniGrafx::drawInternal(int16_t xMove, int16_t yMove, int16_t width,
     for (int b = 0; b < 8; b++) {
       if(bitRead(currentByte, b)) {
         uint16_t currentBit = i * 8 + b;
-        uint16_t pixelX = (i / arrayHeight); 
+        uint16_t pixelX = (i / arrayHeight);
         uint16_t pixelY = (i % arrayHeight) * 8;
         setPixel(pixelX + xMove, pixelY + yMove + b);
       }
@@ -376,11 +380,11 @@ void MiniGrafx::setPixel(uint16_t x, uint16_t y) {
     Serial.println(String(pos) + ", " + String(x) + ", " + String(y));
     return;
   }
-  
+
   uint8_t shift = (x & (pixelsPerByte - 1)) * bitsPerPixel;
   // x: 0 % 2 * 4 = 0
   // x: 1 % 2 * 4 = 0
-  
+
   //uint8_t shift = ((x) % (pixelsPerByte)) * bitsPerPixel;
   //uint8_t shift = 0;
   uint8_t mask = bitMask << shift;
@@ -457,7 +461,7 @@ void MiniGrafx::fillTriangle(uint16_t x1In, uint16_t y1In, uint16_t x2In, uint16
   else if (y[0] == y[1])
   {
     fillTopFlatTriangle(x[0], y[0], x[1], y[1], x[2], y[2]);
-  } 
+  }
   else
   {
     /* general case - split the triangle in a topflat and bottom-flat one */
@@ -472,4 +476,3 @@ void MiniGrafx::drawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2,
   drawLine(x2, y2, x3, y3);
   drawLine(x3, y3, x1, y1);
 }
-

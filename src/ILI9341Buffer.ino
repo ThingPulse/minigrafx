@@ -80,7 +80,7 @@ float p2y[] = {
   0,0,0,0,0,0,0,0};
 
 float r[] = {
-  0,0,0};
+  3.1,3.1,3.1};
 
 #define SHAPE_SIZE 600
 // Define how fast the cube rotates. Smaller numbers are faster.
@@ -93,8 +93,9 @@ void setup() {
   pinMode(TFT_LED, OUTPUT);
   digitalWrite(TFT_LED, HIGH);
 
-  tft.begin();
-  tft.fillScreen(ILI9341_BLACK);
+  gfx.init();
+  gfx.fillBuffer(0);
+  gfx.commit();
 
 
   startMillis = millis();
@@ -138,7 +139,7 @@ int shoelace(int x1, int y1, int x2, int y2, int x3, int y3) {
 
 void drawCube()
 {
-  double speed = 45.0;
+  double speed = 90;
   r[0]=r[0]+PI/speed; // Add a degree
   r[1]=r[1]+PI/speed; // Add a degree
   r[2]=r[2]+PI/speed; // Add a degree
@@ -177,6 +178,20 @@ void drawCube()
     if (shoelace(p2x[faces[i][0]],p2y[faces[i][0]],p2x[faces[i][1]],p2y[faces[i][1]],p2x[faces[i][2]],p2y[faces[i][2]]) > 0) {
       gfx.setColor((i / 2) + 1);
       gfx.fillTriangle(p2x[faces[i][0]],p2y[faces[i][0]],p2x[faces[i][1]],p2y[faces[i][1]],p2x[faces[i][2]],p2y[faces[i][2]]);
+      if (i % 2) {
+        int avX = 0;
+        int avY = 0;
+        for (int v = 0; v < 3; v++) {
+          avX += p2x[faces[i][v]];
+          avY += p2y[faces[i][v]];
+        }
+        avX = avX / 3;
+        avY = avY / 3;
+        gfx.setColor(1);
+
+        //gfx.fillCircle(avX, avY, 2);
+        //gfx.drawString(p2x[faces[i][0]],p2y[faces[i][0]], String(i));
+      }
     }
 
 

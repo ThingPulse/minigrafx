@@ -40,7 +40,7 @@ static inline void spi_begin(void) {
   // max speed!
   SPI.beginTransaction(SPISettings(16000000, MSBFIRST, SPI_MODE0));
 #else
-    // max speed!                  
+    // max speed!
   SPI.beginTransaction(SPISettings(40000000, MSBFIRST, SPI_MODE0));
 #endif
 }
@@ -56,7 +56,7 @@ static inline void spi_end(void) {
 
 // Constructor when using software SPI.  All output pins are configurable.
 Adafruit_ILI9341::Adafruit_ILI9341(int8_t cs, int8_t dc, int8_t mosi,
-           int8_t sclk, int8_t rst, int8_t miso) : Adafruit_GFX(ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT) {
+           int8_t sclk, int8_t rst, int8_t miso) : DisplayDriver(ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT) {
   _cs   = cs;
   _dc   = dc;
   _mosi  = mosi;
@@ -69,7 +69,7 @@ Adafruit_ILI9341::Adafruit_ILI9341(int8_t cs, int8_t dc, int8_t mosi,
 
 // Constructor when using hardware SPI.  Faster, but must use SPI pins
 // specific to each board type (e.g. 11,13 for Uno, 51,52 for Mega, etc.)
-Adafruit_ILI9341::Adafruit_ILI9341(int8_t cs, int8_t dc, int8_t rst) : Adafruit_GFX(ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT) {
+Adafruit_ILI9341::Adafruit_ILI9341(int8_t cs, int8_t dc, int8_t rst) : DisplayDriver(ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT) {
   _cs   = cs;
   _dc   = dc;
   _rst  = rst;
@@ -99,9 +99,9 @@ void Adafruit_ILI9341::spiwrite(uint8_t c) {
 #if defined(ESP8266) || defined(ESP32) || defined (ARDUINO_ARCH_ARC32)
     for(uint8_t bit = 0x80; bit; bit >>= 1) {
       if(c & bit) {
-  digitalWrite(_mosi, HIGH); 
+  digitalWrite(_mosi, HIGH);
       } else {
-  digitalWrite(_mosi, LOW); 
+  digitalWrite(_mosi, LOW);
       }
       digitalWrite(_sclk, HIGH);
       digitalWrite(_sclk, LOW);
@@ -110,10 +110,10 @@ void Adafruit_ILI9341::spiwrite(uint8_t c) {
     // Fast SPI bitbang swiped from LPD8806 library
     for(uint8_t bit = 0x80; bit; bit >>= 1) {
       if(c & bit) {
-  //digitalWrite(_mosi, HIGH); 
+  //digitalWrite(_mosi, HIGH);
   *mosiport |=  mosipinmask;
       } else {
-  //digitalWrite(_mosi, LOW); 
+  //digitalWrite(_mosi, LOW);
   *mosiport &= ~mosipinmask;
       }
       //digitalWrite(_sclk, HIGH);
@@ -162,7 +162,7 @@ void Adafruit_ILI9341::writedata(uint8_t c) {
 #else
   digitalWrite(_cs, HIGH);
 #endif
-} 
+}
 
 
 // Rather than a bazillion writecommand() and writedata() calls, screen
@@ -199,7 +199,7 @@ void Adafruit_ILI9341::commandList(uint8_t *addr) {
 }
 
 
-void Adafruit_ILI9341::begin(void) {
+void Adafruit_ILI9341::init(void) {
   if (_rst > 0) {
     pinMode(_rst, OUTPUT);
     digitalWrite(_rst, LOW);
@@ -268,116 +268,116 @@ void Adafruit_ILI9341::begin(void) {
   Serial.print("\nSelf Diagnostic: 0x"); Serial.println(x, HEX);
 */
   //if(cmdList) commandList(cmdList);
-  
+
   if (hwSPI) spi_begin();
   writecommand(0xEF);
   writedata(0x03);
   writedata(0x80);
   writedata(0x02);
 
-  writecommand(0xCF);  
-  writedata(0x00); 
-  writedata(0XC1); 
-  writedata(0X30); 
+  writecommand(0xCF);
+  writedata(0x00);
+  writedata(0XC1);
+  writedata(0X30);
 
-  writecommand(0xED);  
-  writedata(0x64); 
-  writedata(0x03); 
-  writedata(0X12); 
-  writedata(0X81); 
- 
-  writecommand(0xE8);  
-  writedata(0x85); 
-  writedata(0x00); 
-  writedata(0x78); 
+  writecommand(0xED);
+  writedata(0x64);
+  writedata(0x03);
+  writedata(0X12);
+  writedata(0X81);
 
-  writecommand(0xCB);  
-  writedata(0x39); 
-  writedata(0x2C); 
-  writedata(0x00); 
-  writedata(0x34); 
-  writedata(0x02); 
- 
-  writecommand(0xF7);  
-  writedata(0x20); 
+  writecommand(0xE8);
+  writedata(0x85);
+  writedata(0x00);
+  writedata(0x78);
 
-  writecommand(0xEA);  
-  writedata(0x00); 
-  writedata(0x00); 
- 
-  writecommand(ILI9341_PWCTR1);    //Power control 
-  writedata(0x23);   //VRH[5:0] 
- 
-  writecommand(ILI9341_PWCTR2);    //Power control 
-  writedata(0x10);   //SAP[2:0];BT[3:0] 
- 
-  writecommand(ILI9341_VMCTR1);    //VCM control 
+  writecommand(0xCB);
+  writedata(0x39);
+  writedata(0x2C);
+  writedata(0x00);
+  writedata(0x34);
+  writedata(0x02);
+
+  writecommand(0xF7);
+  writedata(0x20);
+
+  writecommand(0xEA);
+  writedata(0x00);
+  writedata(0x00);
+
+  writecommand(ILI9341_PWCTR1);    //Power control
+  writedata(0x23);   //VRH[5:0]
+
+  writecommand(ILI9341_PWCTR2);    //Power control
+  writedata(0x10);   //SAP[2:0];BT[3:0]
+
+  writecommand(ILI9341_VMCTR1);    //VCM control
   writedata(0x3e); //¶Ô±È¶Èµ÷½Ú
-  writedata(0x28); 
-  
-  writecommand(ILI9341_VMCTR2);    //VCM control2 
+  writedata(0x28);
+
+  writecommand(ILI9341_VMCTR2);    //VCM control2
   writedata(0x86);  //--
- 
-  writecommand(ILI9341_MADCTL);    // Memory Access Control 
+
+  writecommand(ILI9341_MADCTL);    // Memory Access Control
   writedata(0x48);
 
-  writecommand(ILI9341_PIXFMT);    
-  writedata(0x55); 
-  
-  writecommand(ILI9341_FRMCTR1);    
-  writedata(0x00);  
-  writedata(0x18); 
- 
-  writecommand(ILI9341_DFUNCTR);    // Display Function Control 
-  writedata(0x08); 
-  writedata(0x82);
-  writedata(0x27);  
- 
-  writecommand(0xF2);    // 3Gamma Function Disable 
-  writedata(0x00); 
- 
-  writecommand(ILI9341_GAMMASET);    //Gamma curve selected 
-  writedata(0x01); 
- 
-  writecommand(ILI9341_GMCTRP1);    //Set Gamma 
-  writedata(0x0F); 
-  writedata(0x31); 
-  writedata(0x2B); 
-  writedata(0x0C); 
-  writedata(0x0E); 
-  writedata(0x08); 
-  writedata(0x4E); 
-  writedata(0xF1); 
-  writedata(0x37); 
-  writedata(0x07); 
-  writedata(0x10); 
-  writedata(0x03); 
-  writedata(0x0E); 
-  writedata(0x09); 
-  writedata(0x00); 
-  
-  writecommand(ILI9341_GMCTRN1);    //Set Gamma 
-  writedata(0x00); 
-  writedata(0x0E); 
-  writedata(0x14); 
-  writedata(0x03); 
-  writedata(0x11); 
-  writedata(0x07); 
-  writedata(0x31); 
-  writedata(0xC1); 
-  writedata(0x48); 
-  writedata(0x08); 
-  writedata(0x0F); 
-  writedata(0x0C); 
-  writedata(0x31); 
-  writedata(0x36); 
-  writedata(0x0F); 
+  writecommand(ILI9341_PIXFMT);
+  writedata(0x55);
 
-  writecommand(ILI9341_SLPOUT);    //Exit Sleep 
+  writecommand(ILI9341_FRMCTR1);
+  writedata(0x00);
+  writedata(0x18);
+
+  writecommand(ILI9341_DFUNCTR);    // Display Function Control
+  writedata(0x08);
+  writedata(0x82);
+  writedata(0x27);
+
+  writecommand(0xF2);    // 3Gamma Function Disable
+  writedata(0x00);
+
+  writecommand(ILI9341_GAMMASET);    //Gamma curve selected
+  writedata(0x01);
+
+  writecommand(ILI9341_GMCTRP1);    //Set Gamma
+  writedata(0x0F);
+  writedata(0x31);
+  writedata(0x2B);
+  writedata(0x0C);
+  writedata(0x0E);
+  writedata(0x08);
+  writedata(0x4E);
+  writedata(0xF1);
+  writedata(0x37);
+  writedata(0x07);
+  writedata(0x10);
+  writedata(0x03);
+  writedata(0x0E);
+  writedata(0x09);
+  writedata(0x00);
+
+  writecommand(ILI9341_GMCTRN1);    //Set Gamma
+  writedata(0x00);
+  writedata(0x0E);
+  writedata(0x14);
+  writedata(0x03);
+  writedata(0x11);
+  writedata(0x07);
+  writedata(0x31);
+  writedata(0xC1);
+  writedata(0x48);
+  writedata(0x08);
+  writedata(0x0F);
+  writedata(0x0C);
+  writedata(0x31);
+  writedata(0x36);
+  writedata(0x0F);
+
+  writecommand(ILI9341_SLPOUT);    //Exit Sleep
   if (hwSPI) spi_end();
-  delay(120);     
+  delay(120);
   if (hwSPI) spi_begin();
-  writecommand(ILI9341_DISPON);    //Display on 
+  writecommand(ILI9341_DISPON);    //Display on
   if (hwSPI) spi_end();
 
 }
@@ -388,7 +388,7 @@ void Adafruit_ILI9341::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1,
 
   writecommand(ILI9341_CASET); // Column addr set
   writedata(x0 >> 8);
-  writedata(x0 & 0xFF);     // XSTART 
+  writedata(x0 & 0xFF);     // XSTART
   writedata(x1 >> 8);
   writedata(x1 & 0xFF);     // XEND
 
@@ -459,7 +459,7 @@ void Adafruit_ILI9341::drawFastVLine(int16_t x, int16_t y, int16_t h,
   // Rudimentary clipping
   if((x >= _width) || (y >= _height)) return;
 
-  if((y+h-1) >= _height) 
+  if((y+h-1) >= _height)
     h = _height-y;
 
   if (hwSPI) spi_begin();
@@ -647,7 +647,7 @@ uint8_t Adafruit_ILI9341::spiread(void) {
     }
   }
   //Serial.print("read: 0x"); Serial.print(r, HEX);
-  
+
   return r;
 }
 
@@ -656,10 +656,10 @@ uint8_t Adafruit_ILI9341::spiread(void) {
    digitalWrite(_cs, LOW);
    uint8_t r = spiread();
    digitalWrite(_cs, HIGH);
-   
+
    return r;
 }
- 
+
 
 uint8_t Adafruit_ILI9341::readcommand8(uint8_t c, uint8_t index) {
    if (hwSPI) spi_begin();
@@ -674,7 +674,7 @@ uint8_t Adafruit_ILI9341::readcommand8(uint8_t c, uint8_t index) {
    digitalWrite(_sclk, LOW);
    digitalWrite(_cs, LOW);
    spiwrite(c);
- 
+
    digitalWrite(_dc, HIGH);
    uint8_t r = spiread();
    digitalWrite(_cs, HIGH);
@@ -687,10 +687,10 @@ uint8_t Adafruit_ILI9341::readcommand8(uint8_t c, uint8_t index) {
 
 
 void Adafruit_ILI9341::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) {
-  
+
     if (hwSPI) spi_begin();
     setAddrWindow(0, 0, _width - 1, _height -1 );
-  
+
     digitalWrite(_dc, HIGH);
     digitalWrite(_cs, LOW);
 
@@ -719,15 +719,15 @@ void Adafruit_ILI9341::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16
           paletteEntry = (bufferByte >> shift) & mask;
           color = palette[paletteEntry];
           lineBuffer[x * 2] = color >> 8;
-          lineBuffer[x * 2 + 1] = color; 
+          lineBuffer[x * 2 + 1] = color;
         }
         bytePos++;
       }
       SPI.writeBytes(lineBuffer, _width * 2);
     }
-  
+
     digitalWrite(_cs, HIGH);
-  
+
     if (hwSPI) spi_end();
 }
 
@@ -737,50 +737,3 @@ uint16_t Adafruit_ILI9341::getScreenWidth() {
 uint16_t Adafruit_ILI9341::getScreenHeight() {
   return ILI9341_TFTHEIGHT;
 }
-
-
- 
-/*
-
- uint16_t Adafruit_ILI9341::readcommand16(uint8_t c) {
- digitalWrite(_dc, LOW);
- if (_cs)
- digitalWrite(_cs, LOW);
- 
- spiwrite(c);
- pinMode(_sid, INPUT); // input!
- uint16_t r = spiread();
- r <<= 8;
- r |= spiread();
- if (_cs)
- digitalWrite(_cs, HIGH);
- 
- pinMode(_sid, OUTPUT); // back to output
- return r;
- }
- 
- uint32_t Adafruit_ILI9341::readcommand32(uint8_t c) {
- digitalWrite(_dc, LOW);
- if (_cs)
- digitalWrite(_cs, LOW);
- spiwrite(c);
- pinMode(_sid, INPUT); // input!
- 
- dummyclock();
- dummyclock();
- 
- uint32_t r = spiread();
- r <<= 8;
- r |= spiread();
- r <<= 8;
- r |= spiread();
- r <<= 8;
- r |= spiread();
- if (_cs)
- digitalWrite(_cs, HIGH);
- 
- pinMode(_sid, OUTPUT); // back to output
- return r;
- }
- 
- */

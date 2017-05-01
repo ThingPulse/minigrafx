@@ -13,8 +13,8 @@
   MIT license, all text above must be included in any redistribution
  ****************************************************/
 
-#ifndef _ADAFRUIT_ILI9341H_
-#define _ADAFRUIT_ILI9341H_
+#ifndef _MINIGRAFX_ILI9341H_
+#define _MINIGRAFX_ILI9341H_
 
 #if ARDUINO >= 100
  #include "Arduino.h"
@@ -22,24 +22,13 @@
 #else
  #include "WProgram.h"
 #endif
-#include <Adafruit_GFX.h>
+#include "DisplayDriver.h"
 #if defined (__AVR__)
   #include <avr/pgmspace.h>
 #elif defined(ESP8266)
   #include <pgmspace.h>
 #endif
-
-#if defined(ARDUINO_STM32_FEATHER)
-typedef volatile uint32 RwReg;
-#endif
-#if defined(ARDUINO_FEATHER52)
-typedef volatile uint32_t RwReg;
-#endif
-
-// not everything has this!
-#if defined (__AVR__) || defined(TEENSYDUINO)
-#define USE_FAST_PINIO
-#endif
+#include "gfxfont.h"
 
 #define ILI9341_TFTWIDTH  240
 #define ILI9341_TFTHEIGHT 320
@@ -125,7 +114,7 @@ typedef volatile uint32_t RwReg;
 #define BITS_PER_PIXEL 4
 #define PALETTE_COLORS 16
 
-class Adafruit_ILI9341 : public Adafruit_GFX {
+class Adafruit_ILI9341 : public DisplayDriver {
 
  public:
 
@@ -133,17 +122,16 @@ class Adafruit_ILI9341 : public Adafruit_GFX {
        int8_t _RST, int8_t _MISO);
   Adafruit_ILI9341(int8_t _CS, int8_t _DC, int8_t _RST = -1);
 
-  void     begin(void),
-     setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1),
-     pushColor(uint16_t color),
-     fillScreen(uint16_t color),
-     drawPixel(int16_t x, int16_t y, uint16_t color),
-     drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
-     drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
-     fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
-       uint16_t color),
-     setRotation(uint8_t r),
-     invertDisplay(boolean i);
+  void init(void);
+  void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+  void pushColor(uint16_t color);
+  void fillScreen(uint16_t color);
+  void drawPixel(int16_t x, int16_t y, uint16_t color);
+  void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
+  void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
+  void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+  void setRotation(uint8_t r);
+  void invertDisplay(boolean i);
   uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
 
 
@@ -160,10 +148,10 @@ class Adafruit_ILI9341 : public Adafruit_GFX {
   void     dummyclock(void);
   */
 
-  void     spiwrite(uint8_t),
-    writecommand(uint8_t c),
-    writedata(uint8_t d),
-    commandList(uint8_t *addr);
+  void spiwrite(uint8_t);
+  void writecommand(uint8_t c);
+  void writedata(uint8_t d);
+  void commandList(uint8_t *addr);
   uint8_t  spiread(void);
 
  private:

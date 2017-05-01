@@ -46,7 +46,8 @@ enum BUFFER_COLOR_DEPTH {
 class MiniGrafx {
 
  public:
-  MiniGrafx(Adafruit_ILI9341 *driver, uint16_t width, uint16_t height, uint8_t bitsPerPixel, uint16_t *palette);
+  MiniGrafx(DisplayDriver *driver, uint16_t width, uint16_t height, uint8_t bitsPerPixel, uint16_t *palette);
+  void init();
   void setPixel(uint16_t x, uint16_t y);
   void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1);
   void setColor(uint16_t color);
@@ -71,8 +72,8 @@ class MiniGrafx {
   static char* utf8ascii(String s);
   static byte utf8ascii(byte ascii);
 
- private: 
-  Adafruit_ILI9341 *driver;
+ private:
+  DisplayDriver *driver;
   uint16_t width, height;
   uint16_t color;
   uint8_t bitsPerPixel = 4;
