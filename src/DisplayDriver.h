@@ -21,7 +21,6 @@ class DisplayDriver {
   // These MAY be overridden by the subclass to provide device-specific
   // optimized code.  Otherwise 'generic' versions are used.
   virtual void setRotation(uint8_t r);
-  virtual void invertDisplay(boolean i);
   virtual void init() = 0;
   virtual uint16_t getScreenWidth() = 0;
   virtual uint16_t getScreenHeight() = 0;

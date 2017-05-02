@@ -115,9 +115,5 @@ int16_t DisplayDriver::height(void) const {
     return _height;
 }
 
-void DisplayDriver::invertDisplay(boolean i) {
-    // Do nothing, must be subclassed if supported by hardware
-}
-
 /***************************************************************************/
 // code for the GFX button UI element

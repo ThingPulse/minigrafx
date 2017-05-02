@@ -111,8 +111,6 @@
 #define ILI9341_GREENYELLOW 0xAFE5      /* 173, 255,  47 */
 #define ILI9341_PINK        0xF81F
 
-#define BITS_PER_PIXEL 4
-#define PALETTE_COLORS 16
 
 class ILI9341_SPI : public DisplayDriver {
 
@@ -134,16 +132,11 @@ class ILI9341_SPI : public DisplayDriver {
   void spiwrite(uint8_t);
   void writecommand(uint8_t c);
   void writedata(uint8_t d);
-  void commandList(uint8_t *addr);
+
 
 
  private:
-
-
-
-
   boolean  hwSPI;
-
   int32_t  _cs, _dc, _rst, _mosi, _miso, _sclk;
 
 };

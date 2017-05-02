@@ -40,7 +40,8 @@ void MiniGrafx::init() {
 }
 
 void MiniGrafx::setColor(uint16_t color) {
-  this->color = color;
+
+  this->color = color & this->bitMask;
 }
 
 void MiniGrafx::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1) {
@@ -153,29 +154,42 @@ void MiniGrafx::drawHorizontalLine(int16_t x, int16_t y, int16_t length) {
   // bits per pixel: 2
   // bitShift: 2
   // x: 3, y: 14
-  // lowerRemainder = 3 - ((3 >> 2) << 2)
-  // upperRemainder = 14 - ((14 >> 2) << 2)
-  // Case 1: draw pixels until a full byte starts
-  /*for (int16_t i = 0; i < length; i++) {
-    setPixel(x1 + i, y);
-  }*/
-  // Case 2: fill all bites until the end of a full byte
-  uint16_t pos = (y * width + x1) >> bitShift;
-  uint16_t byteLength = length >> bitShift;
-  memset(buffer + pos, color | color << bitsPerPixel, byteLength);
+  // x = 0; x1 = 0, x2 = 1, byteStart = 0, byteEnd = 0
+  // Case 2: fill all bits until the end of a full byte
+  uint16_t startPixel = (y * width + x1);
+  uint16_t endPixel = (y * width + x2);
+  uint16_t byteStart = startPixel >> bitShift;
+  uint16_t byteEnd = endPixel >> bitShift;
+  uint16_t startRemainder = startPixel - (byteStart << bitShift);
+  uint16_t endRemainder = endPixel - (byteEnd << bitShift);
+  if (startRemainder > 0) {
+    byteStart++;
+  }
+  if (endRemainder > 0) {
+    //byteEnd--;
+  }
+  int16_t byteLength = byteEnd - byteStart;
+  uint16_t byteValueColor = 0;
+  for (int i = 0; i < pixelsPerByte; i++) {
+    byteValueColor  = color | byteValueColor << bitsPerPixel;
+  }
+  //Serial.println(String(byteStart) + ", " + String(byteLength));
+  if (byteLength > 0) {
+    memset(buffer + byteStart, byteValueColor, byteLength);
+  }
+
   // Case 3: draw pixels for the remainder
-  int lowerRemainder = x1 - ((x1 >> bitShift) << bitShift);
-  int upperRemainder = 1 + x2 - ((x2 >> bitShift) << bitShift);
-  if (lowerRemainder > 0) {
-    for (int16_t i = 0; i < lowerRemainder; i++) {
+  if (startRemainder > 0) {
+    for (int16_t i = 0; i < startRemainder; i++) {
       setPixel(x1 + i, y);
     }
   }
-  if (upperRemainder > 0) {
-    for (int16_t i = 0; i <= upperRemainder + 1; i++) {
+  if (endRemainder > 0) {
+    for (int16_t i = 0; i <= endRemainder; i++) {
       setPixel(x2 - i, y);
     }
   }
+  //Serial.println(String(x1) + ", " + String(x2) + ", " + String(y) + ": " + String(startRemainder) + ", " + String(endRemainder));
 }
 
 void MiniGrafx::drawVerticalLine(int16_t x, int16_t y, int16_t length) {
