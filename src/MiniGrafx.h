@@ -1,5 +1,6 @@
 #include "ILI9341_SPI.h"
 #include "MiniGrafxFonts.h"
+#include <FS.h>
 
 
 #ifndef _MINI_GRAFXH_
@@ -43,6 +44,9 @@ enum BUFFER_COLOR_DEPTH {
   BIT_16 = 16
 };
 
+#undef max
+#define max(a,b) ((a)>(b)?(a):(b))
+
 class MiniGrafx {
 
  public:
@@ -64,6 +68,10 @@ class MiniGrafx {
   void fillTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3);
   void drawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3);
   uint16_t getStringWidth(const char* text, uint16_t length);
+  void drawXbm(int16_t x, int16_t y, int16_t width, int16_t height, const char *xbm);
+  void drawBmp(String filename, uint8_t x, uint16_t y);
+  uint16_t read16(File &f);
+  uint32_t read32(File &f);
   void setFont(const char *fontData);
   void setTextAlignment(TEXT_ALIGNMENT textAlignment);
   void inline drawInternal(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *data, uint16_t offset, uint16_t bytesInData);
