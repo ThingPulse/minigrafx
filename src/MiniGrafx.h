@@ -69,7 +69,8 @@ class MiniGrafx {
   void drawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3);
   uint16_t getStringWidth(const char* text, uint16_t length);
   void drawXbm(int16_t x, int16_t y, int16_t width, int16_t height, const char *xbm);
-  void drawBmp(String filename, uint8_t x, uint16_t y);
+  void drawBmpFromFile(String filename, uint8_t x, uint16_t y);
+  void drawBmpFromPgm(const char *xbm, uint8_t x, uint16_t y);
   uint16_t read16(File &f);
   uint32_t read32(File &f);
   void setFont(const char *fontData);

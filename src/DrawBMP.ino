@@ -82,22 +82,25 @@ void setup() {
   digitalWrite(TFT_LED, HIGH);
 
   // create grey scale palette for greay image
-  /*for (int i = 0; i < 16; i++) {
+  for (int i = 0; i < 16; i++) {
     palette[i] = ((i * 31 / 16) << 11) | ((i * 63 / 16) << 5) | ((i * 31 / 16));
-  }*/
+  }
 
   gfx.init();
   gfx.fillBuffer(0);
   gfx.commit();
 
   SPIFFS.begin();
-  SPIFFS.remove("file.bmp");
-  File f = SPIFFS.open("file.bmp", "w+");
+  if (!SPIFFS.remove("/file.bmp")) {
+    Serial.println("Could not remove file");
+  }
+  File f = SPIFFS.open("/file.bmp", "w+");
   for (int i = 0; i < image_len; i++) {
     uint8_t data = pgm_read_byte(image + i);
     f.write(data);
   }
   f.close();
+
   //SPIFFS.end();
 
   startMillis = millis();
@@ -108,8 +111,9 @@ void loop() {
 
   gfx.fillBuffer(0);
   gfx.setColor(color);
-  //gfx.drawBmp("file.bmp", 10, 40);
-  gfx.setColor(1);
+  gfx.drawBmpFromFile("/file.bmp", 10, 40 + counter);
+  //gfx.drawBmp(image, 10, 40);
+  gfx.setColor(15);
   gfx.drawString(2, 2, fps);
   for (int i = 0; i < 16; i++) {
     gfx.setColor(i);
