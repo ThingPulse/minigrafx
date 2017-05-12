@@ -89,17 +89,17 @@ void setup() {
   gfx.init();
   gfx.fillBuffer(0);
   gfx.commit();
-
+  //SPIFFS.format();
   SPIFFS.begin();
-  if (!SPIFFS.remove("/file.bmp")) {
+  /*if (!SPIFFS.remove("file.bmp")) {
     Serial.println("Could not remove file");
   }
-  File f = SPIFFS.open("/file.bmp", "w+");
+  File f = SPIFFS.open("file.bmp", "w+");
   for (int i = 0; i < image_len; i++) {
     uint8_t data = pgm_read_byte(image + i);
     f.write(data);
   }
-  f.close();
+  f.close();*/
 
   //SPIFFS.end();
 
@@ -111,7 +111,7 @@ void loop() {
 
   gfx.fillBuffer(0);
   gfx.setColor(color);
-  gfx.drawBmpFromFile("/file.bmp", 10, 40 + counter);
+  gfx.drawBmpFromFile("file.bmp", 10, 40 + counter);
   //gfx.drawBmp(image, 10, 40);
   gfx.setColor(15);
   gfx.drawString(2, 2, fps);

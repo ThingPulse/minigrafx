@@ -77,6 +77,7 @@ class MiniGrafx {
   void setTextAlignment(TEXT_ALIGNMENT textAlignment);
   void inline drawInternal(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *data, uint16_t offset, uint16_t bytesInData);
   void commit();
+  void clear();
   void fillBuffer(uint8_t pal);
   static char* utf8ascii(String s);
   static byte utf8ascii(byte ascii);

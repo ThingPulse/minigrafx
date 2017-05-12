@@ -411,6 +411,10 @@ void MiniGrafx::fillBuffer(uint8_t pal) {
     memset(buffer, pal | pal << bitsPerPixel, bufferSize);
 }
 
+void MiniGrafx::clear() {
+  this->fillBuffer(0);
+}
+
 void MiniGrafx::commit() {
   this->driver->writeBuffer(buffer, bitsPerPixel, palette);
 }
@@ -542,9 +546,9 @@ void MiniGrafx::drawBmpFromFile(String filename, uint8_t x, uint16_t y) {
 
             uint32_t minDistance = 99999999L;
             for (int i = 0; i < (1 << bitsPerPixel); i++) {
-              int16_t rd = (r-paletteRGB[i][0]) * 30;
-              int16_t gd = (g-paletteRGB[i][1]) * 59;
-              int16_t bd = (b-paletteRGB[i][2]) * 11;
+              int16_t rd = (r-paletteRGB[i][0]);
+              int16_t gd = (g-paletteRGB[i][1]);
+              int16_t bd = (b-paletteRGB[i][2]);
               uint32_t distance = rd * rd + gd * gd + bd * bd;
               if (distance < minDistance) {
                 setColor(i);
@@ -805,6 +809,7 @@ void MiniGrafx::fillTriangle(uint16_t x1In, uint16_t y1In, uint16_t x2In, uint16
     fillTopFlatTriangle(x[1], y[1], x4, y4, x[2], y[2]);
   }
 }
+
 void MiniGrafx::drawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3) {
   drawLine(x1, y1, x2, y2);
   drawLine(x2, y2, x3, y3);
