@@ -27,6 +27,7 @@ MiniGrafx::MiniGrafx(DisplayDriver *driver, uint16_t width, uint16_t height, uin
       this->bitShift = 0;
       break;
   }
+
   this->bufferSize = this->width * this->height / (pixelsPerByte);
   this->buffer = (uint8_t*) malloc(sizeof(uint8_t) * bufferSize);
   if(!this->buffer) {
@@ -42,6 +43,10 @@ void MiniGrafx::init() {
 void MiniGrafx::setColor(uint16_t color) {
 
   this->color = color & this->bitMask;
+}
+
+void MiniGrafx::setTransparentColor(uint16_t transparentColor) {
+  this->transparentColor = transparentColor;
 }
 
 void MiniGrafx::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1) {
@@ -384,14 +389,13 @@ void inline MiniGrafx::drawInternal(int16_t xMove, int16_t yMove, int16_t width,
 }
 
 void MiniGrafx::setPixel(uint16_t x, uint16_t y) {
-  if (x >= width || y >= height || x < 0 || y < 0 || color < 0 || color > 15) return;
+  if (x >= width || y >= height || x < 0 || y < 0 || color < 0 || color > 15 || color == transparentColor) return;
   // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
   // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
   // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
   // bitsPerPixel  1, pixPerByte: 8, 3  8 = 2^3
   uint16_t pos = (y * width + x) >> bitShift;
   if (pos > bufferSize) {
-    Serial.println(String(pos) + ", " + String(x) + ", " + String(y));
     return;
   }
 
@@ -574,8 +578,8 @@ void MiniGrafx::drawBmpFromFile(String filename, uint8_t x, uint16_t y) {
 void MiniGrafx::drawBmpFromPgm(const char *bmp, uint8_t x, uint16_t y) {
 
 
-  uint32_t      bmpWidth, bmpHeight;   // W+H in pixels
-  uint16_t  bmpDepth;              // Bit depth (currently must be 24)
+  uint32_t bmpWidth, bmpHeight;   // W+H in pixels
+  uint16_t bmpDepth;              // Bit depth (currently must be 24)
   uint32_t bmpImageoffset;        // Start of image data in file
   uint32_t rowSize;               // Not always = bmpWidth; may have padding
   uint8_t  sdbuffer[3*20]; // pixel buffer (R+G+B per pixel)
@@ -611,7 +615,7 @@ void MiniGrafx::drawBmpFromPgm(const char *bmp, uint8_t x, uint16_t y) {
     //Serial.println(filesize);
     //(void)read32(bmpFile); // Read & ignore creator bytes
     dataPointer += 4;
-    bmpImageoffset = pgm_read_dword(bmp+ dataPointer); // Start of image data
+    bmpImageoffset = pgm_read_dword(bmp + dataPointer); // Start of image data
     dataPointer += 4;
     //Serial.print(F("Image Offset: ")); Serial.println(bmpImageoffset, DEC);
     // Read DIB header
@@ -721,6 +725,31 @@ void MiniGrafx::drawBmpFromPgm(const char *bmp, uint8_t x, uint16_t y) {
 
   //bmpFile.close();
   if(!goodBmp) Serial.println(F("BMP format not recognized."));
+}
+
+void MiniGrafx::drawPalettedBitmapFromPgm(const char *palBmp, uint16_t xMove, uint16_t yMove, uint16_t width, uint16_t height) {
+  int16_t widthRoundedUp = ((width + 1) >> 2) << 2;
+  uint8_t data;
+  uint8_t paletteIndex = 0;
+  uint32_t pointer = 0;
+  bool read = true;
+  for(int16_t y = 0; y < height; y++) {
+    for(int16_t x = 0; x < widthRoundedUp; x++ ) {
+      if (read) {
+        data = pgm_read_byte(palBmp + pointer);
+        pointer = pointer + 1;
+        paletteIndex = data >> 4;
+
+      } else {  // Read new data every 8 bit
+        paletteIndex = data & 0x0F; // Move a bit
+      }
+      //Serial.println(paletteIndex);
+      // if there is a bit draw it
+      setColor(paletteIndex);
+      setPixel(xMove + x, yMove + y);
+      read = !read;
+    }
+  }
 }
 
 uint16_t MiniGrafx::read16(File &f) {

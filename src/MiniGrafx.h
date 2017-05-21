@@ -55,6 +55,7 @@ class MiniGrafx {
   void setPixel(uint16_t x, uint16_t y);
   void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1);
   void setColor(uint16_t color);
+  void setTransparentColor(uint16_t transparentColor);
   void drawCircle(int16_t x0, int16_t y0, uint16_t radius);
   void drawRect(int16_t x, int16_t y, int16_t width, int16_t height);
   void fillRect(int16_t xMove, int16_t yMove, int16_t width, int16_t height);
@@ -71,6 +72,8 @@ class MiniGrafx {
   void drawXbm(int16_t x, int16_t y, int16_t width, int16_t height, const char *xbm);
   void drawBmpFromFile(String filename, uint8_t x, uint16_t y);
   void drawBmpFromPgm(const char *xbm, uint8_t x, uint16_t y);
+  void drawPalettedBitmapFromPgm(const char *palBmp, uint16_t x, uint16_t y, uint16_t width, uint16_t height);
+
   uint16_t read16(File &f);
   uint32_t read32(File &f);
   void setFont(const char *fontData);
@@ -86,6 +89,7 @@ class MiniGrafx {
   DisplayDriver *driver;
   uint16_t width, height;
   uint16_t color;
+  int16_t transparentColor = -1;
   uint8_t bitsPerPixel = 4;
   uint8_t bitShift = 1;
   uint16_t bufferSize = 0;
