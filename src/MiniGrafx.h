@@ -56,6 +56,7 @@ class MiniGrafx {
  public:
   MiniGrafx(DisplayDriver *driver, uint16_t width, uint16_t height, uint8_t bitsPerPixel, uint16_t *palette);
   void init();
+  void setRotation(uint8_t r);
   void setPixel(uint16_t x, uint16_t y);
   uint16_t getPixel(uint16_t x, uint16_t y);
   void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1);
@@ -94,6 +95,7 @@ class MiniGrafx {
   DisplayDriver *driver;
   uint16_t width, height;
   uint16_t color;
+  uint8_t rotation;
   int16_t transparentColor = -1;
   uint8_t bitsPerPixel = 4;
   uint8_t bitShift = 1;

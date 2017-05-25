@@ -36,6 +36,33 @@ MiniGrafx::MiniGrafx(DisplayDriver *driver, uint16_t width, uint16_t height, uin
   this->palette = palette;
 }
 
+void MiniGrafx::setRotation(uint8_t m) {
+  uint16_t widthTemp = width;
+  uint16_t heightTemp = height;
+  rotation = m % 4; // can't be higher than 3
+  switch (rotation) {
+   case 0:
+     this->width  = widthTemp;
+     this->height = heightTemp;
+     break;
+   case 1:
+
+     this->width  = heightTemp;
+     this->height = widthTemp;
+     break;
+  case 2:
+
+     this->width  = widthTemp;
+     this->height = heightTemp;
+    break;
+   case 3:
+     this->width  = heightTemp;
+     this->height = widthTemp;
+     break;
+  }
+  this->driver->setRotation(m);
+}
+
 void MiniGrafx::init() {
   this->driver->init();
 }
