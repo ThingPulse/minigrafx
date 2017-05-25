@@ -29,6 +29,8 @@
 #define FIRST_CHAR_POS 2
 #define CHAR_NUM_POS 3
 
+#define CUSTOM_BITMAP_DATA_START 6
+
 enum TEXT_ALIGNMENT {
   TEXT_ALIGN_LEFT = 0,
   TEXT_ALIGN_RIGHT = 1,
@@ -46,6 +48,8 @@ enum BUFFER_COLOR_DEPTH {
 
 #undef max
 #define max(a,b) ((a)>(b)?(a):(b))
+#undef min
+#define min(a,b) ((a)<(b)?(a):(b))
 
 class MiniGrafx {
 
@@ -53,6 +57,7 @@ class MiniGrafx {
   MiniGrafx(DisplayDriver *driver, uint16_t width, uint16_t height, uint8_t bitsPerPixel, uint16_t *palette);
   void init();
   void setPixel(uint16_t x, uint16_t y);
+  uint16_t getPixel(uint16_t x, uint16_t y);
   void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1);
   void setColor(uint16_t color);
   void setTransparentColor(uint16_t transparentColor);
@@ -72,7 +77,7 @@ class MiniGrafx {
   void drawXbm(int16_t x, int16_t y, int16_t width, int16_t height, const char *xbm);
   void drawBmpFromFile(String filename, uint8_t x, uint16_t y);
   void drawBmpFromPgm(const char *xbm, uint8_t x, uint16_t y);
-  void drawPalettedBitmapFromPgm(const char *palBmp, uint16_t x, uint16_t y, uint16_t width, uint16_t height);
+  void drawPalettedBitmapFromPgm(uint16_t x, uint16_t y, const char *palBmp);
 
   uint16_t read16(File &f);
   uint32_t read32(File &f);

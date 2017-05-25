@@ -32,7 +32,6 @@ Demo for the buffered graphics library. Renders a 3D cube
 #include "MiniGrafx.h" // General graphic library
 #include "ILI9341_SPI.h" // Hardware-specific library
 #include "image.h"
-#include <FS.h>
 
 #define TFT_DC D2
 #define TFT_CS D1
@@ -40,27 +39,13 @@ Demo for the buffered graphics library. Renders a 3D cube
 
 // defines the colors usable in the paletted 16 color frame buffer
 uint16_t palette[] = {ILI9341_BLACK, // 0
-                      ILI9341_WHITE, // 1
-                      ILI9341_NAVY, // 2
-                      ILI9341_DARKCYAN, // 3
-                      ILI9341_DARKGREEN, // 4
-                      ILI9341_MAROON, // 5
-                      ILI9341_PURPLE, // 6
-                      ILI9341_OLIVE, // 7
-                      ILI9341_LIGHTGREY, // 8
-                      0x39E7, //ILI9341_DARKGREY, // 9
-                      ILI9341_BLUE, // 10
-                      ILI9341_GREEN, // 11
-                      ILI9341_CYAN, // 12
-                      ILI9341_RED, // 13
-                      ILI9341_MAGENTA, // 14
-                      0xFD80}; // 15
+                      ILI9341_WHITE}; // 15
 
 
 
 int SCREEN_WIDTH = 240;
 int SCREEN_HEIGHT = 320;
-int BITS_PER_PIXEL = 4; // 2^4 = 16 colors
+int BITS_PER_PIXEL = 1 ; // 2^4 = 16 colors
 
 // Initialize the driver
 ILI9341_SPI tft = ILI9341_SPI(TFT_CS, TFT_DC);
@@ -97,7 +82,7 @@ void loop() {
   gfx.setColor(15);
   gfx.drawString(2, 2, fps);
   gfx.setTransparentColor(0);
-  gfx.drawPalettedBitmapFromPgm(img, 0, -100 + counter % 420, img_width, img_height);
+  gfx.drawPalettedBitmapFromPgm(0, -100 + counter % 420, img);
   gfx.commit();
 
   counter++;

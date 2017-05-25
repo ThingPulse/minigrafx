@@ -65,7 +65,7 @@ void MiniGrafx::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1) {
   dx = x1 - x0;
   dy = abs(y1 - y0);
 
-  int16_t err = dx / 2;
+  int16_t err = dx >> 2;
   int16_t ystep;
 
   if (y0 < y1) {
@@ -148,53 +148,16 @@ void MiniGrafx::fillCircle(int16_t x0, int16_t y0, int16_t radius) {
 }
 
 void MiniGrafx::drawHorizontalLine(int16_t x, int16_t y, int16_t length) {
-  int x1 = x;
-  int x2 = x + length;
-  if (length < 0) {
-    x1 = x + length;
-    x2 = x;
-    length = abs(length);
+  int16_t x1 = x;
+  int16_t x2 = x + length + 1;
+  if (x1 > x2) {
+    _swap_int16_t(x1, x2);
   }
-  // 000000XX|XXXXXXXX|XXXXXXXX|XXXX0000|
-  // bits per pixel: 2
-  // bitShift: 2
-  // x: 3, y: 14
-  // x = 0; x1 = 0, x2 = 1, byteStart = 0, byteEnd = 0
-  // Case 2: fill all bits until the end of a full byte
-  uint16_t startPixel = (y * width + x1);
-  uint16_t endPixel = (y * width + x2);
-  uint16_t byteStart = startPixel >> bitShift;
-  uint16_t byteEnd = endPixel >> bitShift;
-  uint16_t startRemainder = startPixel - (byteStart << bitShift);
-  uint16_t endRemainder = endPixel - (byteEnd << bitShift);
-  if (startRemainder > 0) {
-    byteStart++;
-  }
-  if (endRemainder > 0) {
-    //byteEnd--;
-  }
-  int16_t byteLength = byteEnd - byteStart;
-  uint16_t byteValueColor = 0;
-  for (int i = 0; i < pixelsPerByte; i++) {
-    byteValueColor  = color | byteValueColor << bitsPerPixel;
-  }
-  //Serial.println(String(byteStart) + ", " + String(byteLength));
-  if (byteLength > 0) {
-    memset(buffer + byteStart, byteValueColor, byteLength);
+  for (int i = x1; i <= x2; i++) {
+    setPixel(i, y);
   }
 
-  // Case 3: draw pixels for the remainder
-  if (startRemainder > 0) {
-    for (int16_t i = 0; i < startRemainder; i++) {
-      setPixel(x1 + i, y);
-    }
-  }
-  if (endRemainder > 0) {
-    for (int16_t i = 0; i <= endRemainder; i++) {
-      setPixel(x2 - i, y);
-    }
-  }
-  //Serial.println(String(x1) + ", " + String(x2) + ", " + String(y) + ": " + String(startRemainder) + ", " + String(endRemainder));
+
 }
 
 void MiniGrafx::drawVerticalLine(int16_t x, int16_t y, int16_t length) {
@@ -220,7 +183,7 @@ void MiniGrafx::drawString(int16_t xMove, int16_t yMove, String strUser) {
       lb += (text[i] == 10);
     }
     // Calculate center
-    yOffset = (lb * lineHeight) / 2;
+    yOffset = (lb * lineHeight) >> 2;
   }
 
   uint16_t line = 0;
@@ -411,6 +374,22 @@ void MiniGrafx::setPixel(uint16_t x, uint16_t y) {
   buffer[pos] = (buffer[pos] & ~mask) | (palColor & mask);
 }
 
+uint16_t MiniGrafx::getPixel(uint16_t x, uint16_t y) {
+  if (x >= width || y >= height || x < 0 || y < 0 || color < 0 || color > 15) return 0;
+  // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
+  // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
+  // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
+  // bitsPerPixel  1, pixPerByte: 8, 3  8 = 2^3
+  uint16_t pos = (y * width + x) >> bitShift;
+  if (pos > bufferSize) {
+    return 0;
+  }
+
+  uint8_t shift = (x & (pixelsPerByte - 1)) * bitsPerPixel;
+
+  return (buffer[pos] >> shift) & bitMask;
+}
+
 void MiniGrafx::fillBuffer(uint8_t pal) {
     memset(buffer, pal | pal << bitsPerPixel, bufferSize);
 }
@@ -424,7 +403,7 @@ void MiniGrafx::commit() {
 }
 
 void MiniGrafx::drawXbm(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *xbm) {
-  int16_t widthInXbm = (width + 7) / 8;
+  int16_t widthInXbm = (width + 7) >> 3;
   uint8_t data;
 
   for(int16_t y = 0; y < height; y++) {
@@ -432,7 +411,7 @@ void MiniGrafx::drawXbm(int16_t xMove, int16_t yMove, int16_t width, int16_t hei
       if (x & 7) {
         data >>= 1; // Move a bit
       } else {  // Read new data every 8 bit
-        data = pgm_read_byte(xbm + (x / 8) + y * widthInXbm);
+        data = pgm_read_byte(xbm + (x >> 3) + y * widthInXbm);
       }
       // if there is a bit draw it
       if (data & 0x01) {
@@ -727,28 +706,46 @@ void MiniGrafx::drawBmpFromPgm(const char *bmp, uint8_t x, uint16_t y) {
   if(!goodBmp) Serial.println(F("BMP format not recognized."));
 }
 
-void MiniGrafx::drawPalettedBitmapFromPgm(const char *palBmp, uint16_t xMove, uint16_t yMove, uint16_t width, uint16_t height) {
-  int16_t widthRoundedUp = ((width + 1) >> 2) << 2;
+void MiniGrafx::drawPalettedBitmapFromPgm(uint16_t xMove, uint16_t yMove, const char *palBmp) {
+  uint8_t version = pgm_read_byte(palBmp);
+  uint8_t bmpBitDepth = pgm_read_byte(palBmp + 1);
+  if (bmpBitDepth != bitsPerPixel) {
+    Serial.println("Bmp has wrong bit depth");
+    return;
+  }
+  uint16_t width = pgm_read_byte(palBmp + 2) << 8 | pgm_read_byte(palBmp + 3);
+  uint16_t height = pgm_read_byte(palBmp + 4) << 8 | pgm_read_byte(palBmp + 5);
+  int16_t widthRoundedUp = (width + 7) & ~7;
   uint8_t data;
   uint8_t paletteIndex = 0;
-  uint32_t pointer = 0;
-  bool read = true;
+  uint32_t pointer = CUSTOM_BITMAP_DATA_START;
+  // bitdepth = 8, initialShift = 0
+  // bitdepth = 4, initialShift = 4
+  // bitdepth = 2, initialShift = 6
+  // bitdepth = 1, initialShift = 7
+  uint8_t shift = 8 - bitsPerPixel;
+  data = pgm_read_byte(palBmp + pointer);
+  uint8_t bitCounter = 0;
   for(int16_t y = 0; y < height; y++) {
-    for(int16_t x = 0; x < widthRoundedUp; x++ ) {
-      if (read) {
+    for(int16_t x = 0; x < width; x++ ) {
+      if (bitCounter == pixelsPerByte) {
         data = pgm_read_byte(palBmp + pointer);
-        pointer = pointer + 1;
-        paletteIndex = data >> 4;
-
-      } else {  // Read new data every 8 bit
-        paletteIndex = data & 0x0F; // Move a bit
+        pointer++;
+        //shift = bitsPerPixel;
+        bitCounter = 0;
       }
+      shift = 8 - (bitCounter + 1) * bitsPerPixel;
+      paletteIndex = (data >> shift) & bitMask;
+
+      //Serial.println(String(x) + ", " + String(y) + ": " + String(bitCounter) + ", " + String(shift));
       //Serial.println(paletteIndex);
       // if there is a bit draw it
       setColor(paletteIndex);
       setPixel(xMove + x, yMove + y);
-      read = !read;
+      bitCounter++;
     }
+    pointer++;
+    bitCounter = 0;
   }
 }
 
@@ -778,7 +775,8 @@ void MiniGrafx::fillBottomFlatTriangle(uint16_t x1, uint16_t y1, uint16_t x2, ui
 
   for (int scanlineY = y1; scanlineY <= y2; scanlineY++)
   {
-    drawHorizontalLine((int)curx1, scanlineY, (int)curx2 - curx1);
+    //drawHorizontalLine(curx1, scanlineY, curx2 - curx1);
+    drawLine(curx1, scanlineY, curx2, scanlineY);
     curx1 += invslope1;
     curx2 += invslope2;
   }
@@ -794,7 +792,8 @@ void MiniGrafx::fillTopFlatTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint1
 
   for (int scanlineY = y3; scanlineY > y1; scanlineY--)
   {
-    drawHorizontalLine((int)curx1, scanlineY, (int)curx2 - curx1);
+    //drawHorizontalLine(curx1, scanlineY, curx2 - curx1);
+    drawLine(curx1, scanlineY, curx2, scanlineY);
     curx1 -= invslope1;
     curx2 -= invslope2;
   }
