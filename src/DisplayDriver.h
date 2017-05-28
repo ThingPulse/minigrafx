@@ -15,15 +15,10 @@ class DisplayDriver {
 
   DisplayDriver(int16_t w, int16_t h); // Constructor
 
-
-
-  // CONTROL API
-  // These MAY be overridden by the subclass to provide device-specific
-  // optimized code.  Otherwise 'generic' versions are used.
   virtual void setRotation(uint8_t r);
   virtual void init() = 0;
-  virtual uint16_t getScreenWidth() = 0;
-  virtual uint16_t getScreenHeight() = 0;
+  //virtual uint16_t getScreenWidth() = 0;
+  //virtual uint16_t getScreenHeight() = 0;
   virtual void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) = 0;
 
   int16_t height(void) const;
