@@ -125,8 +125,8 @@ class ILI9341_SPI : public DisplayDriver {
   void setRotation(uint8_t r);
 
   void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette);
-  uint16_t getScreenWidth();
-  uint16_t getScreenHeight();
+  //uint16_t getScreenWidth();
+  //uint16_t getScreenHeight();
 
 
   void spiwrite(uint8_t);

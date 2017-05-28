@@ -449,9 +449,9 @@ void ILI9341_SPI::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *p
     if (hwSPI) spi_end();
 }
 
-uint16_t ILI9341_SPI::getScreenWidth() {
+/*uint16_t ILI9341_SPI::getScreenWidth() {
   return ILI9341_TFTWIDTH;
-}
-uint16_t ILI9341_SPI::getScreenHeight() {
+}*/
+/*uint16_t ILI9341_SPI::getScreenHeight() {
   return ILI9341_TFTHEIGHT;
-}
+}*/
