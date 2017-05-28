@@ -83,6 +83,7 @@ void setup() {
 
   gfx.init();
   gfx.fillBuffer(0);
+  gfx.drawPalettedBitmapFromPgm(0, -100 + counter % 420, img);
   gfx.commit();
 
 
@@ -97,7 +98,7 @@ void loop() {
   gfx.setColor(15);
   gfx.drawString(2, 2, fps);
   gfx.setTransparentColor(0);
-  gfx.drawPalettedBitmapFromPgm(0, -100 + counter % 420, img);
+  gfx.drawPalettedBitmapFromPgm(100, 100, img);
   gfx.commit();
 
   counter++;
