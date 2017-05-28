@@ -244,8 +244,8 @@ void MiniGrafx::drawStringInternal(int16_t xMove, int16_t yMove, char* text, uin
   }
 
   // Don't draw anything if it is not on the screen.
-  if (xMove + textWidth  < 0 || xMove > driver->getScreenWidth() ) {return;}
-  if (yMove + textHeight < 0 || yMove > driver->getScreenHeight()) {return;}
+  if (xMove + textWidth  < 0 || xMove > this->width ) {return;}
+  if (yMove + textHeight < 0 || yMove > this->height) {return;}
 
   for (uint16_t j = 0; j < textLength; j++) {
     int16_t xPos = xMove + cursorX;
@@ -350,8 +350,8 @@ uint16_t MiniGrafx::getStringWidth(const char* text, uint16_t length) {
 
 void inline MiniGrafx::drawInternal(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *data, uint16_t offset, uint16_t bytesInData) {
   if (width < 0 || height < 0) return;
-  if (yMove + height < 0 || yMove > driver->getScreenHeight())  return;
-  if (xMove + width  < 0 || xMove > driver->getScreenWidth())   return;
+  if (yMove + height < 0 || yMove > this->height)  return;
+  if (xMove + width  < 0 || xMove > this->width)   return;
 
   uint8_t  rasterHeight = 1 + ((height - 1) >> 3); // fast ceil(height / 8.0)
   int8_t   yOffset      = yMove & 7;
@@ -418,7 +418,11 @@ uint16_t MiniGrafx::getPixel(uint16_t x, uint16_t y) {
 }
 
 void MiniGrafx::fillBuffer(uint8_t pal) {
-    memset(buffer, pal | pal << bitsPerPixel, bufferSize);
+    uint8_t byteCol = pal;
+    for (int i = 0; i < pixelsPerByte; i++) {
+      byteCol = byteCol | (pal << i);
+    }
+    memset(buffer, byteCol, bufferSize);
 }
 
 void MiniGrafx::clear() {
@@ -742,7 +746,9 @@ void MiniGrafx::drawPalettedBitmapFromPgm(uint16_t xMove, uint16_t yMove, const 
   }
   uint16_t width = pgm_read_byte(palBmp + 2) << 8 | pgm_read_byte(palBmp + 3);
   uint16_t height = pgm_read_byte(palBmp + 4) << 8 | pgm_read_byte(palBmp + 5);
+
   int16_t widthRoundedUp = (width + 7) & ~7;
+
   uint8_t data;
   uint8_t paletteIndex = 0;
   uint32_t pointer = CUSTOM_BITMAP_DATA_START;
@@ -755,7 +761,9 @@ void MiniGrafx::drawPalettedBitmapFromPgm(uint16_t xMove, uint16_t yMove, const 
   uint8_t bitCounter = 0;
   for(int16_t y = 0; y < height; y++) {
     for(int16_t x = 0; x < width; x++ ) {
-      if (bitCounter == pixelsPerByte) {
+
+      if (bitCounter == pixelsPerByte || bitCounter == 0) {
+        //Serial.println("Reading new data");
         data = pgm_read_byte(palBmp + pointer);
         pointer++;
         //shift = bitsPerPixel;
@@ -764,15 +772,16 @@ void MiniGrafx::drawPalettedBitmapFromPgm(uint16_t xMove, uint16_t yMove, const 
       shift = 8 - (bitCounter + 1) * bitsPerPixel;
       paletteIndex = (data >> shift) & bitMask;
 
-      //Serial.println(String(x) + ", " + String(y) + ": " + String(bitCounter) + ", " + String(shift));
+      //Serial.println(String(x) + ", " + String(y) + ": Pointer:" + String(pointer) + ", data:" + String(data) + ", Bit:" + String(bitCounter) + ", Shift:" + String(shift) + ", IDX:" + String(paletteIndex));
       //Serial.println(paletteIndex);
       // if there is a bit draw it
       setColor(paletteIndex);
       setPixel(xMove + x, yMove + y);
       bitCounter++;
     }
-    pointer++;
+    //pointer++;
     bitCounter = 0;
+
   }
 }
 
