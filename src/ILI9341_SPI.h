@@ -28,7 +28,7 @@
 #elif defined(ESP8266)
   #include <pgmspace.h>
 #endif
-#include "gfxfont.h"
+
 
 #define ILI9341_TFTWIDTH  240
 #define ILI9341_TFTHEIGHT 320

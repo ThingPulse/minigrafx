@@ -81,7 +81,7 @@ WIDTH(w), HEIGHT(h)
     textcolor = textbgcolor = 0xFFFF;
     wrap      = true;
     _cp437    = false;
-    gfxFont   = NULL;
+
 }
 
 uint8_t DisplayDriver::getRotation(void) const {

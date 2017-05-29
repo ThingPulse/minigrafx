@@ -7,7 +7,7 @@
 #else
  #include "WProgram.h"
 #endif
-#include "gfxfont.h"
+
 
 class DisplayDriver {
 
@@ -41,8 +41,7 @@ class DisplayDriver {
   boolean
     wrap,   // If set, 'wrap' text at right edge of display
     _cp437; // If set, use correct CP437 charset (default is off)
-  GFXfont
-    *gfxFont;
+
 };
 
 
