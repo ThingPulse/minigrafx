@@ -158,6 +158,27 @@ void  EPD_Class::setFactor(int temperature) {
 
 void EPD_Class::init() {
 
+  //pinMode(this->EPD_Pin_RED_LED, OUTPUT);
+  //pinMode(Pin_SW2, INPUT);
+  //pinMode(Pin_TEMPERATURE, INPUT);
+  //pinMode(Pin_PWM, OUTPUT);
+  //pinMode(Pin_BUSY, INPUT);
+  pinMode(this->EPD_Pin_RESET, OUTPUT);
+  pinMode(this->EPD_Pin_PANEL_ON, OUTPUT);
+  pinMode(this->EPD_Pin_DISCHARGE, OUTPUT);
+  pinMode(this->EPD_Pin_BORDER, OUTPUT);
+  pinMode(this->EPD_Pin_EPD_CS, OUTPUT);
+  //pinMode(Pin_FLASH_CS, OUTPUT);
+
+  //digitalWrite(this->EPD_Pin_RED_LED, LOW);
+  //digitalWrite(Pin_PWM, LOW);  // not actually used - set low so can use current eval board unmodified
+  digitalWrite(this->EPD_Pin_RESET, LOW);
+  digitalWrite(this->EPD_Pin_PANEL_ON, LOW);
+  digitalWrite(this->EPD_Pin_DISCHARGE, LOW);
+  digitalWrite(this->EPD_Pin_BORDER, LOW);
+  digitalWrite(this->EPD_Pin_EPD_CS, LOW);
+  //digitalWrite(Pin_FLASH_CS, HIGH);
+
   // assume ok
   this->status = EPD_OK;
 
