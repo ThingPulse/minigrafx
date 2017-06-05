@@ -37,8 +37,7 @@ const int Pin_RED_LED = D8;//13;
 
 
 // defines the colors usable in the paletted 16 color frame buffer
-uint16_t palette[] = {0, // 0
-                      1};
+uint16_t palette[] = {0, 1};
 
 
 // LED anode through resistor to I/O pin
