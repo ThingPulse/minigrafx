@@ -9,8 +9,9 @@
 
 #define EPD_BUSY_LEVEL 0
 
-#define EPD1X54 1
-#ifdef EPD2X9
+//#define EPD1X54 1
+#define EPD2X9 1
+/*#ifdef EPD2X9
   #define xDot 128
   #define yDot 296
   #define DELAYTIME 1500
@@ -25,9 +26,9 @@
   #define yDot 200
   #define DELAYTIME 1500
 // static const  unsigned char GDVol[] = {0x03,0x00};  // Gate voltage +15V/-15V
-#endif
+#endif*/
 
-static const unsigned char GDOControl[]={0x01,(yDot-1)%256,(yDot-1)/256,0x00}; //for 1.54inch
+//static const unsigned char GDOControl[]={0x01,(yDot-1)%256,(yDot-1)/256,0x00}; //for 1.54inch
 static const unsigned char softstart[]={0x0c,0xd7,0xd6,0x9d};
 //  static const unsigned char Rambypass[] = {0x21,0x8f};   // Display update
 //  static const unsigned char MAsequency[] = {0x22,0xf0};    // clock
@@ -60,10 +61,16 @@ static const unsigned char RamDataEntryMode[] = {0x11,0x01};  // Ram data entry 
   };
 #endif
 
+enum EPD_TYPE {
+  EPD1_54,
+  EPD02_13,
+  EPD2_9
+};
+
 class EPD_WS_154 : public DisplayDriver {
 
   public:
-    EPD_WS_154(uint8_t csPin, uint8_t rstPin, uint8_t dcPin, uint8_t busyPin, uint16_t w, uint16_t h);
+    EPD_WS_154(EPD_TYPE epdType, uint8_t csPin, uint8_t rstPin, uint8_t dcPin, uint8_t busyPin);
 
     void setRotation(uint8_t r);
     void init();
@@ -73,7 +80,8 @@ class EPD_WS_154 : public DisplayDriver {
     void EPD_init_Part(void);
     void Dis_Clear_full(void);
 
-
+    static int getWidth(EPD_TYPE epdType);
+    static int getHeight(EPD_TYPE epdType);
 
   private:
     uint8_t csPin;
@@ -81,6 +89,12 @@ class EPD_WS_154 : public DisplayDriver {
     uint8_t dcPin;
     uint8_t busyPin;
     uint8_t rotation;
+    uint16_t delaytime;
+    uint16_t xDot;
+    uint16_t yDot;
+    uint16_t bufferWidth;
+    uint16_t bufferHeight;
+    unsigned char GDOControl[4];
 
     unsigned char ReadBusy(void);
     uint8_t Reverse_bits(uint8_t num);

@@ -8,20 +8,22 @@
 #define DC D8
 #define BUSY D1
 
-#define SCREEN_WIDTH 200
-#define SCREEN_HEIGHT 200
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 296
 #define BITS_PER_PIXEL 1
 
 
 uint16_t palette[] = {0, 1};
 
-EPD_WS_154 epd(CS, RST, DC, BUSY, 200, 200);
-MiniGrafx gfx = MiniGrafx(&epd, SCREEN_WIDTH, SCREEN_HEIGHT, BITS_PER_PIXEL, palette);
+EPD_WS_154 epd(EPD2_9, CS, RST, DC, BUSY);
+MiniGrafx gfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette);
 
 void setup() {
   gfx.init();
+
 }
- uint8_t rotation = 0;
+
+uint8_t rotation = 0;
 
 void loop() {
   //epd.Dis_Clear_full();
@@ -34,7 +36,7 @@ void loop() {
   gfx.fillBuffer(1);
   gfx.setColor(0);
   gfx.setFont(ArialMT_Plain_10);
-  //gfx.drawLine(0, 0, 200, 200);
+  gfx.drawLine(0, 0, gfx.getWidth(), gfx.getHeight());
   gfx.drawString(10, 10, "Hello World");
   gfx.setFont(ArialMT_Plain_16);
   gfx.drawString(10, 30, "Everything works!");

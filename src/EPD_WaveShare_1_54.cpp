@@ -3,15 +3,76 @@
 
 
 
-EPD_WS_154::EPD_WS_154(uint8_t csPin, uint8_t rstPin, uint8_t dcPin, uint8_t busyPin, uint16_t width, uint16_t height) : DisplayDriver(width, height)  {
+EPD_WS_154::EPD_WS_154(EPD_TYPE epdType, uint8_t csPin, uint8_t rstPin, uint8_t dcPin, uint8_t busyPin) : DisplayDriver(getWidth(epdType), getHeight(epdType))  {
   this->csPin = csPin;
   this->rstPin = rstPin;
   this->dcPin = dcPin;
   this->busyPin = busyPin;
+  switch(epdType) {
+    case EPD1_54:
+      delaytime = 1500;
+      xDot = 200;
+      yDot = 200;
+      break;
+    case EPD02_13:
+      delaytime = 4000;
+      xDot = 128;
+      yDot = 250;
+      break;
+    case EPD2_9:
+      delaytime = 1500;
+      xDot = 128;
+      yDot = 296;
+      break;
+  }
+  GDOControl[0] = 0x01;
+  GDOControl[1] = (yDot-1)%256;
+  GDOControl[2] = (yDot-1)/256;
+  GDOControl[3] = 0x00;
+}
+
+int EPD_WS_154::getWidth(EPD_TYPE epdType) {
+  switch(epdType) {
+    case EPD1_54:
+      return 200;
+    case EPD02_13:
+      return 128;
+    case EPD2_9:
+      return 128;
+  }
+}
+
+int EPD_WS_154::getHeight(EPD_TYPE epdType) {
+  switch(epdType) {
+    case EPD1_54:
+      return 200;
+    case EPD02_13:
+      return 250;
+    case EPD2_9:
+      return 296;
+  }
 }
 
 void EPD_WS_154::setRotation(uint8_t r) {
   this->rotation = r;
+  switch(r) {
+    case 0:
+      bufferWidth = width();
+      bufferHeight = height();
+      break;
+    case 1:
+      bufferWidth = height();
+      bufferHeight = width();
+      break;
+    case 2:
+      bufferWidth = width();
+      bufferHeight = height();
+      break;
+    case 3:
+      bufferWidth = height();
+      bufferHeight = width();
+      break;
+  }
 }
 void EPD_WS_154::init() {
   pinMode(csPin,OUTPUT);
@@ -45,13 +106,13 @@ void EPD_WS_154::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *pa
 	//init
 	Serial.println("full init");
 	EPD_init_Full();
-	driver_delay_xms(DELAYTIME);
+	driver_delay_xms(delaytime);
 
 	//Clear screen
 	//Serial.println("full clear\t\n");
 	m=0xff;
 	EPD_Dis_Full((unsigned char *)&m,0);  //all white
-	driver_delay_xms(DELAYTIME);
+	driver_delay_xms(delaytime);
 
   uint16_t XSize = xDot;
   uint16_t YSize = yDot;
@@ -79,20 +140,20 @@ void EPD_WS_154::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *pa
         data = data << 1;
         switch (rotation) {
           case 0:
-            x = i;
-            y = (j * 8 + b);
-            break;
-          case 1:
-            x = xDot - i;
-            y = yDot - (j * 8 + b);
-            break;
-          case 2:
             x = xDot - (j * 8 + b);
             y = i;
             break;
-          case 3:
+          case 1:
+            x = i;
+            y = (j * 8 + b);
+            break;
+          case 2:
             x = (j * 8 + b);
-            y = yDot -i;
+            y = yDot - i;
+            break;
+          case 3:
+            x = yDot - i;
+            y = xDot - (j * 8 + b);
             break;
         }
         data = data | (getPixel(buffer, x, y) & 1);
@@ -114,12 +175,12 @@ uint8_t EPD_WS_154::getPixel(uint8_t *buffer, uint16_t x, uint16_t y) {
   uint8_t pixelsPerByte = 8 / bitsPerPixel;
   uint8_t bitShift = 3;
 
-  if (x >= xDot || y >= yDot || x < 0 || y < 0) return 0;
+  if (x >= bufferWidth || y >= bufferHeight || x < 0 || y < 0) return 0;
   // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
   // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
   // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
   // bitsPerPixel  1, pixPerByte: 8, 3  8 = 2^3
-  uint16_t pos = (y * xDot + x) >> bitShift;
+  uint16_t pos = (y * bufferWidth + x) >> bitShift;
 
   uint8_t shift = (x & (pixelsPerByte - 1)) * bitsPerPixel;
 
@@ -460,13 +521,13 @@ void EPD_WS_154::Dis_Clear_full(void)
 	//init
 	Serial.println("full init");
 	EPD_init_Full();
-	driver_delay_xms(DELAYTIME);
+	driver_delay_xms(delaytime);
 
 	//Clear screen
 	Serial.println("full clear\t\n");
 	m=0xff;
 	EPD_Dis_Full((unsigned char *)&m,0);  //all white
-	driver_delay_xms(DELAYTIME);
+	driver_delay_xms(delaytime);
 }
 /********************************************************************************
 		clear part screen

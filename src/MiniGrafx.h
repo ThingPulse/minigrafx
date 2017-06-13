@@ -54,8 +54,10 @@ enum BUFFER_COLOR_DEPTH {
 class MiniGrafx {
 
  public:
-  MiniGrafx(DisplayDriver *driver, uint16_t width, uint16_t height, uint8_t bitsPerPixel, uint16_t *palette);
+  MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette);
   void init();
+  uint16_t getHeight();
+  uint16_t getWidth();
   void setRotation(uint8_t r);
   void setPixel(uint16_t x, uint16_t y);
   uint16_t getPixel(uint16_t x, uint16_t y);

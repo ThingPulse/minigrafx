@@ -1,10 +1,10 @@
 
 #include "MiniGrafx.h"
 
-MiniGrafx::MiniGrafx(DisplayDriver *driver, uint16_t width, uint16_t height, uint8_t bitsPerPixel, uint16_t *palette) {
+MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette) {
   this->driver = driver;
-  this->width = width;
-  this->height = height;
+  this->width = driver->width();
+  this->height = driver->height();
   this->bitsPerPixel = bitsPerPixel;
   this->bitMask = (1 << bitsPerPixel) - 1;
   this->pixelsPerByte = 8 / bitsPerPixel;
@@ -28,6 +28,8 @@ MiniGrafx::MiniGrafx(DisplayDriver *driver, uint16_t width, uint16_t height, uin
       break;
   }
 
+
+
   this->bufferSize = this->width * this->height / (pixelsPerByte);
   this->buffer = (uint8_t*) malloc(sizeof(uint8_t) * bufferSize);
   if(!this->buffer) {
@@ -36,28 +38,33 @@ MiniGrafx::MiniGrafx(DisplayDriver *driver, uint16_t width, uint16_t height, uin
   this->palette = palette;
 }
 
+uint16_t MiniGrafx::getHeight() {
+  return height;
+}
+uint16_t MiniGrafx::getWidth() {
+  return width;
+}
+
 void MiniGrafx::setRotation(uint8_t m) {
-  uint16_t widthTemp = width;
-  uint16_t heightTemp = height;
   rotation = m % 4; // can't be higher than 3
   switch (rotation) {
    case 0:
-     this->width  = widthTemp;
-     this->height = heightTemp;
+     this->width  = driver->width();
+     this->height = driver->height();
      break;
    case 1:
 
-     this->width  = heightTemp;
-     this->height = widthTemp;
+     this->width  = driver->height();
+     this->height = driver->width();
      break;
   case 2:
 
-     this->width  = widthTemp;
-     this->height = heightTemp;
+     this->width  = driver->width();
+     this->height = driver->height();
     break;
    case 3:
-     this->width  = heightTemp;
-     this->height = widthTemp;
+     this->width  = driver->height();
+     this->height = driver->width();
      break;
   }
   this->driver->setRotation(m);
