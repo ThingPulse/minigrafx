@@ -67,10 +67,10 @@ enum EPD_TYPE {
   EPD2_9
 };
 
-class EPD_WS_154 : public DisplayDriver {
+class EPD_WaveShare : public DisplayDriver {
 
   public:
-    EPD_WS_154(EPD_TYPE epdType, uint8_t csPin, uint8_t rstPin, uint8_t dcPin, uint8_t busyPin);
+    EPD_WaveShare(EPD_TYPE epdType, uint8_t csPin, uint8_t rstPin, uint8_t dcPin, uint8_t busyPin);
 
     void setRotation(uint8_t r);
     void init();

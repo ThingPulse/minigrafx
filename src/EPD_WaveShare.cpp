@@ -1,9 +1,9 @@
-#include "EPD_WaveShare_1_54.h"
+#include "EPD_WaveShare.h"
 
 
 
 
-EPD_WS_154::EPD_WS_154(EPD_TYPE epdType, uint8_t csPin, uint8_t rstPin, uint8_t dcPin, uint8_t busyPin) : DisplayDriver(getWidth(epdType), getHeight(epdType))  {
+EPD_WaveShare::EPD_WaveShare(EPD_TYPE epdType, uint8_t csPin, uint8_t rstPin, uint8_t dcPin, uint8_t busyPin) : DisplayDriver(getWidth(epdType), getHeight(epdType))  {
   this->csPin = csPin;
   this->rstPin = rstPin;
   this->dcPin = dcPin;
@@ -31,7 +31,7 @@ EPD_WS_154::EPD_WS_154(EPD_TYPE epdType, uint8_t csPin, uint8_t rstPin, uint8_t 
   GDOControl[3] = 0x00;
 }
 
-int EPD_WS_154::getWidth(EPD_TYPE epdType) {
+int EPD_WaveShare::getWidth(EPD_TYPE epdType) {
   switch(epdType) {
     case EPD1_54:
       return 200;
@@ -42,7 +42,7 @@ int EPD_WS_154::getWidth(EPD_TYPE epdType) {
   }
 }
 
-int EPD_WS_154::getHeight(EPD_TYPE epdType) {
+int EPD_WaveShare::getHeight(EPD_TYPE epdType) {
   switch(epdType) {
     case EPD1_54:
       return 200;
@@ -53,7 +53,7 @@ int EPD_WS_154::getHeight(EPD_TYPE epdType) {
   }
 }
 
-void EPD_WS_154::setRotation(uint8_t r) {
+void EPD_WaveShare::setRotation(uint8_t r) {
   this->rotation = r;
   switch(r) {
     case 0:
@@ -74,7 +74,7 @@ void EPD_WS_154::setRotation(uint8_t r) {
       break;
   }
 }
-void EPD_WS_154::init() {
+void EPD_WaveShare::init() {
   pinMode(csPin,OUTPUT);
   pinMode(dcPin,OUTPUT);
   pinMode(rstPin,OUTPUT);
@@ -88,17 +88,17 @@ void EPD_WS_154::init() {
 
 }
 
-void EPD_WS_154::driver_delay_xms(unsigned long xms)
+void EPD_WaveShare::driver_delay_xms(unsigned long xms)
 {
 	delay(xms);
 }
 
-void EPD_WS_154::SPI_Write(unsigned char value)
+void EPD_WaveShare::SPI_Write(unsigned char value)
 {
  SPI.transfer(value);
 }
 
-void EPD_WS_154::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) {
+void EPD_WaveShare::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) {
   Serial.println("Writing buffer");
 
 
@@ -169,7 +169,7 @@ void EPD_WS_154::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *pa
 
 }
 
-uint8_t EPD_WS_154::getPixel(uint8_t *buffer, uint16_t x, uint16_t y) {
+uint8_t EPD_WaveShare::getPixel(uint8_t *buffer, uint16_t x, uint16_t y) {
   uint8_t bitsPerPixel = 1;
   uint8_t bitMask = (1 << bitsPerPixel) - 1;
   uint8_t pixelsPerByte = 8 / bitsPerPixel;
@@ -187,7 +187,7 @@ uint8_t EPD_WS_154::getPixel(uint8_t *buffer, uint16_t x, uint16_t y) {
   return (buffer[pos] >> shift) & bitMask;
 }
 
-uint8_t EPD_WS_154::Reverse_bits(uint8_t num){
+uint8_t EPD_WaveShare::Reverse_bits(uint8_t num){
 
     int i=7; //size of unsigned char -1, on most machine is 8bits
     uint8_t j=0;
@@ -206,7 +206,7 @@ uint8_t EPD_WS_154::Reverse_bits(uint8_t num){
 function：
 			read busy
 *******************************************************************************/
-unsigned char EPD_WS_154::ReadBusy(void)
+unsigned char EPD_WaveShare::ReadBusy(void)
 {
   unsigned long i=0;
   for(i=0;i<400;i++){
@@ -223,7 +223,7 @@ unsigned char EPD_WS_154::ReadBusy(void)
 function：
 		write command
 *******************************************************************************/
-void EPD_WS_154::EPD_WriteCMD(unsigned char command)
+void EPD_WaveShare::EPD_WriteCMD(unsigned char command)
 {
   digitalWrite(this->csPin,LOW);
 	digitalWrite (this->dcPin,LOW);		// command write
@@ -234,7 +234,7 @@ void EPD_WS_154::EPD_WriteCMD(unsigned char command)
 function：
 		write command and data
 *******************************************************************************/
-void EPD_WS_154::EPD_WriteCMD_p1(unsigned char command,unsigned char para)
+void EPD_WaveShare::EPD_WriteCMD_p1(unsigned char command,unsigned char para)
 {
 	ReadBusy();
   digitalWrite(this->csPin,LOW);
@@ -248,7 +248,7 @@ void EPD_WS_154::EPD_WriteCMD_p1(unsigned char command,unsigned char para)
 function：
 		Configure the power supply
 *******************************************************************************/
-void EPD_WS_154::EPD_POWERON(void)
+void EPD_WaveShare::EPD_POWERON(void)
 {
 	EPD_WriteCMD_p1(0x22,0xc0);
 	EPD_WriteCMD(0x20);
@@ -262,7 +262,7 @@ function：
 		the address after a shift,
 		the length of less than one byte
 *******************************************************************************/
-void EPD_WS_154::EPD_Write(const unsigned char *value, unsigned char datalen)
+void EPD_WaveShare::EPD_Write(const unsigned char *value, unsigned char datalen)
 {
 	unsigned char i = 0;
 	const unsigned char *ptemp;
@@ -287,7 +287,7 @@ Parameters:
 		integer multiple of 8 times YSize y direction quantity Dispbuff displays
 		the data storage location. The data must be arranged in a correct manner
 ********************************************************************************/
-void EPD_WS_154::EPD_WriteDispRam(unsigned char XSize,unsigned int YSize,
+void EPD_WaveShare::EPD_WriteDispRam(unsigned char XSize,unsigned int YSize,
 							unsigned char *Dispbuff)
 {
 	int i = 0,j = 0;
@@ -316,7 +316,7 @@ Parameters: XSize x the direction of the direction of 128 points,adjusted to
 			an integer multiple of 8 times YSize y direction quantity  Dispdata
 			display data.
 ********************************************************************************/
-void EPD_WS_154::EPD_WriteDispRamMono(unsigned char XSize,unsigned int YSize,
+void EPD_WaveShare::EPD_WriteDispRamMono(unsigned char XSize,unsigned int YSize,
 							unsigned char dispdata)
 {
 	int i = 0,j = 0;
@@ -341,7 +341,7 @@ void EPD_WS_154::EPD_WriteDispRamMono(unsigned char XSize,unsigned int YSize,
 /********************************************************************************
 Set RAM X and Y -address Start / End position
 ********************************************************************************/
-void EPD_WS_154::EPD_SetRamArea(unsigned char Xstart,unsigned char Xend,
+void EPD_WaveShare::EPD_SetRamArea(unsigned char Xstart,unsigned char Xend,
 						unsigned char Ystart,unsigned char Ystart1,unsigned char Yend,unsigned char Yend1)
 {
   unsigned char RamAreaX[3];	// X start and end
@@ -361,7 +361,7 @@ void EPD_WS_154::EPD_SetRamArea(unsigned char Xstart,unsigned char Xend,
 /********************************************************************************
 Set RAM X and Y -address counter
 ********************************************************************************/
-void EPD_WS_154::EPD_SetRamPointer(unsigned char addrX,unsigned char addrY,unsigned char addrY1)
+void EPD_WaveShare::EPD_SetRamPointer(unsigned char addrX,unsigned char addrY,unsigned char addrY1)
 {
   unsigned char RamPointerX[2];	// default (0,0)
 	unsigned char RamPointerY[3];
@@ -381,7 +381,7 @@ void EPD_WS_154::EPD_SetRamPointer(unsigned char addrX,unsigned char addrY,unsig
 1.Set RAM X and Y -address Start / End position
 2.Set RAM X and Y -address counter
 ********************************************************************************/
-void EPD_WS_154::EPD_part_display(unsigned char RAM_XST,unsigned char RAM_XEND,unsigned char RAM_YST,unsigned char RAM_YST1,unsigned char RAM_YEND,unsigned char RAM_YEND1)
+void EPD_WaveShare::EPD_part_display(unsigned char RAM_XST,unsigned char RAM_XEND,unsigned char RAM_YST,unsigned char RAM_YST1,unsigned char RAM_YEND,unsigned char RAM_YEND1)
 {
 	EPD_SetRamArea(RAM_XST,RAM_XEND,RAM_YST,RAM_YST1,RAM_YEND,RAM_YEND1);  	/*set w h*/
     EPD_SetRamPointer (RAM_XST,RAM_YST,RAM_YST1);		    /*set orginal*/
@@ -391,7 +391,7 @@ void EPD_WS_154::EPD_part_display(unsigned char RAM_XST,unsigned char RAM_XEND,u
 /*******************************************************************************
 Initialize the register
 ********************************************************************************/
-void EPD_WS_154::EPD_Init(void)
+void EPD_WaveShare::EPD_Init(void)
 {
 	//1.reset driver
 	digitalWrite(this->rstPin,LOW);		// Module reset
@@ -415,13 +415,13 @@ void EPD_WS_154::EPD_Init(void)
 /********************************************************************************
 Display data updates
 ********************************************************************************/
-void EPD_WS_154::EPD_Update(void)
+void EPD_WaveShare::EPD_Update(void)
 {
 	EPD_WriteCMD_p1(0x22,0xc7);
 	EPD_WriteCMD(0x20);
 	EPD_WriteCMD(0xff);
 }
-void EPD_WS_154::EPD_Update_Part(void)
+void EPD_WaveShare::EPD_Update_Part(void)
 {
 	EPD_WriteCMD_p1(0x22,0x04);
 	EPD_WriteCMD(0x20);
@@ -430,7 +430,7 @@ void EPD_WS_154::EPD_Update_Part(void)
 /*******************************************************************************
 write the waveform to the dirver's ram
 ********************************************************************************/
-void EPD_WS_154::EPD_WirteLUT(unsigned char *LUTvalue,unsigned char Size)
+void EPD_WaveShare::EPD_WirteLUT(unsigned char *LUTvalue,unsigned char Size)
 {
 	EPD_Write(LUTvalue, Size);
 }
@@ -438,7 +438,7 @@ void EPD_WS_154::EPD_WirteLUT(unsigned char *LUTvalue,unsigned char Size)
 /*******************************************************************************
 Full screen initialization
 ********************************************************************************/
-void EPD_WS_154::EPD_init_Full(void)
+void EPD_WaveShare::EPD_init_Full(void)
 {
 	EPD_Init();			// Reset and set register
   EPD_WirteLUT((unsigned char *)LUTDefault_full,sizeof(LUTDefault_full));
@@ -450,7 +450,7 @@ void EPD_WS_154::EPD_init_Full(void)
 /*******************************************************************************
 Part screen initialization
 ********************************************************************************/
-void EPD_WS_154::EPD_init_Part(void)
+void EPD_WaveShare::EPD_init_Part(void)
 {
 	EPD_Init();			// display
 	EPD_WirteLUT((unsigned char *)LUTDefault_part,sizeof(LUTDefault_part));
@@ -462,7 +462,7 @@ parameter:
        		=1 Displays the contents of the DisBuffer
 	   		=0 Displays the contents of the first byte in DisBuffer,
 ********************************************************************************/
-void EPD_WS_154::EPD_Dis_Full(unsigned char *DisBuffer,unsigned char Label)
+void EPD_WaveShare::EPD_Dis_Full(unsigned char *DisBuffer,unsigned char Label)
 {
     EPD_SetRamPointer(0x00,(yDot-1)%256,(yDot-1)/256);	// set ram
 	Serial.println(">>>>>>------start send display data!!---------<<<<<<<");
@@ -486,7 +486,7 @@ parameter:
        		=1 Displays the contents of the DisBuffer
 	   		=0 Displays the contents of the first byte in DisBuffer,
 ********************************************************************************/
-void EPD_WS_154::EPD_Dis_Part(unsigned char xStart,unsigned char xEnd,unsigned long yStart,unsigned long yEnd,unsigned char *DisBuffer,unsigned char Label)
+void EPD_WaveShare::EPD_Dis_Part(unsigned char xStart,unsigned char xEnd,unsigned long yStart,unsigned long yEnd,unsigned char *DisBuffer,unsigned char Label)
 {
 	Serial.println(">>>>>>------start send display data!!---------<<<<<<<");
 	if(Label==0){// black
@@ -515,7 +515,7 @@ void EPD_WS_154::EPD_Dis_Part(unsigned char xStart,unsigned char xEnd,unsigned l
 /********************************************************************************
 		clear full screen
 ********************************************************************************/
-void EPD_WS_154::Dis_Clear_full(void)
+void EPD_WaveShare::Dis_Clear_full(void)
 {
 	unsigned char m;
 	//init
@@ -532,7 +532,7 @@ void EPD_WS_154::Dis_Clear_full(void)
 /********************************************************************************
 		clear part screen
 ********************************************************************************/
-/*void EPD_WS_154::Dis_Clear_part(void)
+/*void EPD_WaveShare::Dis_Clear_part(void)
 {
 	unsigned char m;
 	//init
