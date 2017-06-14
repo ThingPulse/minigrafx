@@ -1,6 +1,8 @@
+![](https://api.travis-ci.org/squix78/minigrafx.svg?branch=master)
+
 # The MiniGrafx Library
 
-This is a graphics library for embedded devices containing a framebuffer to avoid flickering. Instead of writing directly to the display all drawing operations are made on the buffer stored in memory. Once you are finished with one drawing cycle the whole content of the framebuffer is written to the display. 
+This is a graphics library for embedded devices containing a framebuffer to avoid flickering. Instead of writing directly to the display all drawing operations are made on the buffer stored in memory. Once you are finished with one drawing cycle the whole content of the framebuffer is written to the display.
 
 ## Inspiration
 
