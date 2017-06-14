@@ -18,7 +18,7 @@
 
 // required libraries
 #include <SPI.h>
-#include "EPaper/EPaperPervasive.h"
+#include "EPaperPervasive.h"
 #include "MiniGrafx.h"
 #include "DisplayDriver.h"
 
