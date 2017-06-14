@@ -9,7 +9,14 @@ cache:
         - "~/.platformio"
 
 env:
-    - PLATFORMIO_CI_SRC=examples/3DCube
+    - PLATFORMIO_CI_SRC=examples/ILI9341/RotatingCube
+    - PLATFORMIO_CI_SRC=examples/ILI9341/DrawXBM
+    - PLATFORMIO_CI_SRC=examples/ILI9341/DrawPaletteImage_4Bit
+    - PLATFORMIO_CI_SRC=examples/ILI9341/DrawPaletteImage_1Bit
+    - PLATFORMIO_CI_SRC=examples/ILI9341/Carousel
+    - PLATFORMIO_CI_SRC=examples/ILI9341/BasicDrawing
+    - PLATFORMIO_CI_SRC=examples/EPaper/EPaperDemo2_54Pervasive
+    - PLATFORMIO_CI_SRC=examples/EPaper/EPD_WaveShare_2_9
 
 
 install:
@@ -19,4 +26,3 @@ install:
 
 script:
     - platformio ci --lib="." --board=nodemcuv2
-Contact GitHub API Training Shop Blog About
