@@ -52,7 +52,7 @@ uint16_t palette[] = {0, 1};
 
 // define the E-Ink display
 EPD_Class epd(EPD_SIZE, SCREEN_WIDTH, SCREEN_HEIGHT, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_RESET, Pin_BUSY, Pin_EPD_CS);
-MiniGrafx gfx = MiniGrafx(&epd, SCREEN_WIDTH, SCREEN_HEIGHT, BITS_PER_PIXEL, palette);
+MiniGrafx gfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette);
 
 // I/O setup
 void setup() {
