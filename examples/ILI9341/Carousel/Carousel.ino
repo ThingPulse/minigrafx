@@ -32,7 +32,7 @@ int BITS_PER_PIXEL = 4; // 2^4 = 16 colors
 
 // Initialize the driver
 ILI9341_SPI tft = ILI9341_SPI(TFT_CS, TFT_DC);
-MiniGrafx gfx = MiniGrafx(&tft, SCREEN_WIDTH, SCREEN_HEIGHT, BITS_PER_PIXEL, palette);
+MiniGrafx gfx = MiniGrafx(&tft, BITS_PER_PIXEL, palette);
 Carousel carousel(&gfx, 0, 0, 240, 100);
 
 void drawFrame1(MiniGrafx *display, CarouselState* state, int16_t x, int16_t y) {

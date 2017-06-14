@@ -64,7 +64,7 @@ int BITS_PER_PIXEL = 4 ; // 2^4 = 16 colors
 
 // Initialize the driver
 ILI9341_SPI tft = ILI9341_SPI(TFT_CS, TFT_DC);
-MiniGrafx gfx = MiniGrafx(&tft, SCREEN_WIDTH, SCREEN_HEIGHT, BITS_PER_PIXEL, palette);
+MiniGrafx gfx = MiniGrafx(&tft, BITS_PER_PIXEL, palette);
 
 
 // Used for fps measuring
