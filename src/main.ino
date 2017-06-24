@@ -62,33 +62,19 @@ MiniGrafx gfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette);
 
 void setup() {
   gfx.init();
-
+  gfx.setRotation(1);
+  gfx.fillBuffer(1);
+  gfx.setColor(0);
+  gfx.setFont(ArialMT_Plain_10);
+  gfx.drawString(10, 10, "ePaper Display");
+  gfx.setFont(ArialMT_Plain_16);
+  gfx.drawString(10, 30, "Everything works!");
+  gfx.setFont(ArialMT_Plain_24);
+  gfx.drawString(10, 55, "Yes! Millis: " + String(millis()));
+  gfx.commit();
 }
 
 uint8_t rotation = 0;
 
 void loop() {
-  //epd.Dis_Clear_full();
-  //delay(1500);
-  //epd.EPD_init_Part();
-  //delay(1000);
-
-  //gfx.init();
-  gfx.setRotation(rotation);
-  gfx.fillBuffer(1);
-  gfx.setColor(0);
-  gfx.setFont(ArialMT_Plain_10);
-  //gfx.drawLine(0, 0, gfx.getWidth(), gfx.getHeight());
-  gfx.drawString(10, 10, "Hello World");
-  gfx.setFont(ArialMT_Plain_16);
-  gfx.drawString(10, 30, "Everything works!");
-  gfx.setFont(ArialMT_Plain_24);
-  gfx.drawString(10, 55, "Yes! Millis: " + String(millis()));
-
-  gfx.drawCircle(10, 10, 10);
-  gfx.drawRect(50, 50, 15, 15);
-
-  gfx.commit();
-  delay(5000);
-  rotation = (rotation + 1) % 4;
 }
