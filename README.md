@@ -16,6 +16,9 @@ First you have to include the basic graphic routines and the header file matchin
 ## Fork by Vincent Dupont
 Quick & Dirty Code adaptation - works on Arduino Mega 2560 with Waveshare 2.9 ePaper
 Not tested with other board or display
+EPD_WaveShare_2_9 example works
+
+Lot of Linter warning (mostly types conversions), not fixed.
 
 Adapt the library to Arduino Mega board (megaatmega2560)
 Adding SD Library support instead of FS.h
