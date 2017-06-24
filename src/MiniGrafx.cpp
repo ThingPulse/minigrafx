@@ -486,7 +486,17 @@ void MiniGrafx::drawBmpFromFile(String filename, uint8_t x, uint16_t y) {
   Serial.print(filename);
   Serial.println('\'');*/
 
-  bmpFile = SPIFFS.open(filename, "r");
+
+
+  #if defined(__AVR_ATmega2560__)
+
+      char filenameArray[filename.length()];
+      filename.toCharArray(filenameArray, filename.length());
+      bmpFile = SD.open(filenameArray, FILE_READ);
+  #else
+      bmpFile = SPIFFS.open(filename, "r");
+  #endif
+
   // Open requested file on SD card
   if (!bmpFile) {
     Serial.print(F("File not found"));
@@ -549,7 +559,14 @@ void MiniGrafx::drawBmpFromFile(String filename, uint8_t x, uint16_t y) {
           else     // Bitmap is stored top-to-bottom
             pos = bmpImageoffset + row * rowSize;
           if(bmpFile.position() != pos) { // Need seek?
-            bmpFile.seek(pos, SeekSet);
+
+            #if defined(__AVR_ATmega2560__)
+              bmpFile.seek(pos);
+            #else
+              bmpFile.seek(pos, SeekSet);
+            #endif
+
+
             buffidx = sizeof(sdbuffer); // Force buffer reload
           }
 

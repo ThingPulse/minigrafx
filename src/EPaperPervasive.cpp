@@ -794,10 +794,18 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value,
 static void SPI_on() {
   SPI.end();
   SPI.begin();
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setDataMode(SPI_MODE0);
+
   SPI.setClockDivider(SPI_CLOCK_DIV2);
-  SPI.setFrequency(8000000L);
+
+  #if defined(__AVR_ATmega2560__)
+    SPI.beginTransaction(SPISettings(8000000L, MSBFIRST, SPI_MODE0));
+  #else
+    SPI.setBitOrder(MSBFIRST);
+    SPI.setDataMode(SPI_MODE0);
+    SPI.setFrequency(8000000L);
+  #endif
+
+
   SPI_put(0x00);
   SPI_put(0x00);
   Delay_us(10);

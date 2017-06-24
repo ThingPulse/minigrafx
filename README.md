@@ -12,3 +12,8 @@ developed by Fabrice Weinberg and myself mostly for tiny OLED displays. This new
 ## Basic flow
 
 First you have to include the basic graphic routines and the header file matching your display:
+
+## Fork by Vincent Dupont
+
+Adapt the library to Arduino Mega board (megaatmega2560)
+SD Library support

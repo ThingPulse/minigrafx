@@ -19,6 +19,7 @@
   "frameworks": "arduino",
   "platforms": [
     "espressif8266",
-    "espressif32"
+    "espressif32",
+    "megaatmega2560"
   ]
 }

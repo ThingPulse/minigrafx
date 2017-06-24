@@ -1,6 +1,12 @@
 #include "ILI9341_SPI.h"
 #include "MiniGrafxFonts.h"
-#include <FS.h>
+
+#if defined(__AVR_ATmega2560__)
+  #include <SD.h>
+#else
+  #include <FS.h>
+#endif
+
 
 
 #ifndef _MINI_GRAFXH_

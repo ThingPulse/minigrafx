@@ -35,20 +35,20 @@ Demo for the buffered graphics library. Renders a 3D cube
 
 /*
  Connect the following pins:
- Display  NodeMCU
- BUSY     D1
- RST      D2
- DC       D8
- CS       D3
- CLK      D5
- DIN      D7
+ Display  Arduino default PINs
+ BUSY     D7
+ RST      D8
+ DC       D9
+ CS       D10
+ CLK      D13
+ DIN      D11
  GND      GND
  3.3V     3V3
 */
-#define CS D3
-#define RST D2
-#define DC D8
-#define BUSY D1
+#define CS 10
+#define RST 8
+#define DC 9
+#define BUSY 7
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 296

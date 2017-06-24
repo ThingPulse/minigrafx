@@ -110,16 +110,16 @@ void ILI9341_SPI::spiwrite(uint8_t c) {
     // Fast SPI bitbang swiped from LPD8806 library
     for(uint8_t bit = 0x80; bit; bit >>= 1) {
       if(c & bit) {
-  //digitalWrite(_mosi, HIGH);
-  *mosiport |=  mosipinmask;
+  digitalWrite(_mosi, HIGH);
+  //*mosiport |=  mosipinmask;
       } else {
-  //digitalWrite(_mosi, LOW);
-  *mosiport &= ~mosipinmask;
+  digitalWrite(_mosi, LOW);
+  //*mosiport &= ~mosipinmask;
       }
-      //digitalWrite(_sclk, HIGH);
-      *clkport |=  clkpinmask;
-      //digitalWrite(_sclk, LOW);
-      *clkport &= ~clkpinmask;
+      digitalWrite(_sclk, HIGH);
+      //*clkport |=  clkpinmask;
+      digitalWrite(_sclk, LOW);
+      //*clkport &= ~clkpinmask;
     }
 #endif
   }
@@ -441,7 +441,11 @@ void ILI9341_SPI::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *p
         }
         bytePos++;
       }
-      SPI.writeBytes(lineBuffer, _width * 2);
+      #if defined(__AVR_ATmega2560__)
+        SPI.transfer(lineBuffer, _width * 2 );
+      #else
+        SPI.writeBytes(lineBuffer, _width * 2);
+      #endif
     }
 
     digitalWrite(_cs, HIGH);
