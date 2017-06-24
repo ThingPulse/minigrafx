@@ -14,6 +14,9 @@ developed by Fabrice Weinberg and myself mostly for tiny OLED displays. This new
 First you have to include the basic graphic routines and the header file matching your display:
 
 ## Fork by Vincent Dupont
+Quick & Dirty Code adaptation - works on Arduino Mega 2560 with Waveshare 2.9 ePaper
+Not tested with other board or display
 
 Adapt the library to Arduino Mega board (megaatmega2560)
-SD Library support
+Adding SD Library support instead of FS.h
+Fixing Methods calls when not fully aligned with SD Methods
