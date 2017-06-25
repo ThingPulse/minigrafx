@@ -37,6 +37,40 @@ MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *pale
   }
   this->palette = palette;
 }
+void MiniGrafx::changeBitDepth(uint8_t bitsPerPixel, uint16_t *palette) {
+  free(this->buffer);
+  this->bitsPerPixel = bitsPerPixel;
+  this->bitMask = (1 << bitsPerPixel) - 1;
+  this->pixelsPerByte = 8 / bitsPerPixel;
+  // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
+  // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
+  // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
+  // bitsPerPixel  1, pixPerByte: 8, 3  8 = 2^3
+  // TODO: I was too stupid or too lazy to get the formula for this
+  switch(bitsPerPixel) {
+    case 1:
+      this->bitShift = 3;
+      break;
+    case 2:
+      this->bitShift = 2;
+      break;
+    case 4:
+      this->bitShift = 1;
+      break;
+    case 8:
+      this->bitShift = 0;
+      break;
+  }
+
+
+
+  this->bufferSize = this->width * this->height / (pixelsPerByte);
+  this->buffer = (uint8_t*) malloc(sizeof(uint8_t) * bufferSize);
+  if(!this->buffer) {
+    Serial.println("[DEBUG_MINI_GRAFX][init] Not enough memory to create display\n");
+  }
+  this->palette = palette;
+}
 
 uint16_t MiniGrafx::getHeight() {
   return height;
@@ -151,7 +185,7 @@ void MiniGrafx::drawCircle(int16_t x0, int16_t y0, uint16_t radius) {
 void MiniGrafx::drawRect(int16_t x, int16_t y, int16_t width, int16_t height) {
   drawHorizontalLine(x, y, width);
   drawVerticalLine(x, y, height);
-  drawVerticalLine(x + width - 1, y, height);
+  drawVerticalLine(x + width, y, height);
   drawHorizontalLine(x, y + height - 1, width);
 }
 

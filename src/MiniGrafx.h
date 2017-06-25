@@ -56,6 +56,7 @@ class MiniGrafx {
  public:
   MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette);
   void init();
+  void changeBitDepth(uint8_t bitsPerPixel, uint16_t *palette);
   uint16_t getHeight();
   uint16_t getWidth();
   void setRotation(uint8_t r);
