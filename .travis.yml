@@ -20,7 +20,7 @@ env:
 
 install:
     - pip install -U platformio
-    #- platformio lib install "JsonStreamingParser" "WifiManager" "simpleDSTadjust" "DHT sensor library"
+    - platformio lib install "XPT2046_Touchscreen"
     - platformio lib update
 
 script:
