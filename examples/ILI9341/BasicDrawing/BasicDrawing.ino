@@ -32,8 +32,6 @@ Demo for the buffered graphics library. Renders a 3D cube
 #include "MiniGrafx.h" // General graphic library
 #include "ILI9341_SPI.h" // Hardware-specific library
 
-
-
 #define TFT_DC D2
 #define TFT_CS D1
 #define TFT_LED D8
@@ -66,14 +64,6 @@ int BITS_PER_PIXEL = 4 ; // 2^4 = 16 colors
 ILI9341_SPI tft = ILI9341_SPI(TFT_CS, TFT_DC);
 MiniGrafx gfx = MiniGrafx(&tft, BITS_PER_PIXEL, palette);
 
-
-// Used for fps measuring
-uint16_t counter = 0;
-long startMillis = millis();
-uint16_t interval = 20;
-int color = 1;
-String fps = "0fps";
-
 void setup() {
   Serial.begin(115200);
 
@@ -81,48 +71,20 @@ void setup() {
   pinMode(TFT_LED, OUTPUT);
   digitalWrite(TFT_LED, HIGH);
 
+  // Initialize the driver only once
   gfx.init();
+  // fill the buffer with black
   gfx.fillBuffer(0);
+  // write the buffer to the display
   gfx.commit();
-
-
-  startMillis = millis();
 }
 
-int width = 20;
 
 void loop() {
-
   gfx.fillBuffer(0);
-
-  width = 20 + (counter % 20);
-
-  for(int y = 0; y < 320; y = y + width) {
-    for (int x = 0; x < 240; x = x + width) {
-      if ((x + y) % (width * 2) == 0) {
-        gfx.setColor(6);
-        gfx.fillRect(x, y, width, width);
-      } else {
-        gfx.setColor(7);
-        gfx.fillCircle(x + width / 2, y + width / 2, width / 2);
-      }
-      gfx.setColor(1);
-      gfx.drawLine(0, y, 240, y);
-      gfx.setColor(2);
-      gfx.drawLine(x, 0, x, 320);
-
-    }
-  }
-  gfx.setColor(15);
-  gfx.drawString(2, 2, fps);
+  gfx.setColor(1);
+  gfx.drawLine(0, 0, 20, 20);
+  gfx.setColor(13);
+  gfx.fillCircle(20, 20, 5);
   gfx.commit();
-
-  counter++;
-  // only calculate the fps every <interval> iterations.
-  if (counter % interval == 0) {
-    color = (color + 1) % 15 + 1;
-    long millisSinceUpdate = millis() - startMillis;
-    fps = String(interval * 1000.0 / (millisSinceUpdate)) + "fps";
-    startMillis = millis();
-  }
 }
