@@ -32,6 +32,7 @@ Demo for the buffered graphics library. Renders a 3D cube
 #include <XPT2046_Touchscreen.h>
 #include "MiniGrafx.h" // General graphic library
 #include "ILI9341_SPI.h" // Hardware-specific library
+#include <FS.h>
 
 #define TFT_DC D2
 #define TFT_CS D1
@@ -69,6 +70,9 @@ MiniGrafx gfx = MiniGrafx(&tft, BITS_PER_PIXEL, palette);
 
 XPT2046_Touchscreen ts(TOUCH_CS, TOUCH_IRQ);
 
+bool loadTouchCalibration();
+bool saveTouchCalibration();
+
 TS_Point p1, p2;
 int state = 0;
 int lastStateChange = 0;
@@ -89,6 +93,10 @@ void setup() {
     gfx.init();
     gfx.fillBuffer(0);
     gfx.commit();
+    bool isCalibrationAvailable = loadTouchCalibration();
+    if (isCalibrationAvailable) {
+      state = 2;
+    }
 }
 
 void loop() {
@@ -100,7 +108,7 @@ void loop() {
       gfx.setColor(1);
       gfx.setTextAlignment(TEXT_ALIGN_CENTER);
       gfx.drawString(120, 160, "Please Touch Circle");
-      gfx.drawCircle(0, 0, 10);
+      gfx.fillCircle(5, 5, 5);
       if (ts.touched()) {
         p1 = p;
         state++;
@@ -113,7 +121,7 @@ void loop() {
       gfx.setColor(1);
       gfx.setTextAlignment(TEXT_ALIGN_CENTER);
       gfx.drawString(120, 160, "Please Touch Circle");
-      gfx.drawCircle(240, 320, 10);
+      gfx.drawCircle(235, 315, 5);
       if (ts.touched() && (millis() - lastStateChange > 1000)) {
 
         p2 = p;
@@ -124,6 +132,7 @@ void loop() {
         ax = p1.y < p2.y ? p1.y : p2.y;
         ay = p1.x < p2.x ? p1.x : p2.x;
         gfx.fillBuffer(0);
+        saveTouchCalibration();
       }
 
     } else {
@@ -149,4 +158,52 @@ void loop() {
     }
 
   gfx.commit();
+}
+
+bool loadTouchCalibration() {
+
+  // always use this to "mount" the filesystem
+  bool result = SPIFFS.begin();
+  Serial.println("SPIFFS opened: " + result);
+
+  // this opens the file "f.txt" in read-mode
+  File f = SPIFFS.open("/calibration.txt", "r");
+
+  if (!f) {
+    return false;
+  } else {
+
+      //Lets read line by line from the file
+      String dxStr = f.readStringUntil('\n');
+      String dyStr = f.readStringUntil('\n');
+      String axStr = f.readStringUntil('\n');
+      String ayStr = f.readStringUntil('\n');
+
+      dx = dxStr.toFloat();
+      dy = dyStr.toFloat();
+      ax = axStr.toInt();
+      ay = ayStr.toInt();
+
+  }
+  f.close();
+}
+
+bool saveTouchCalibration() {
+
+
+  // always use this to "mount" the filesystem
+  bool result = SPIFFS.begin();
+
+  // open the file in write mode
+  File f = SPIFFS.open("/calibration.txt", "w");
+  if (!f) {
+    Serial.println("file creation failed");
+  }
+  // now write two lines in key/value style with  end-of-line characters
+  f.println(dx);
+  f.println(dy);
+  f.println(ax);
+  f.println(ay);
+
+  f.close();
 }
