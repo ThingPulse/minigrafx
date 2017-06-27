@@ -74,22 +74,30 @@ you define how many bits should be internally be used to represent each pixel.
 
  So check first how much memory your embedded device offers!
 
-void setup() {
-  Serial.begin(115200);
+ In the setup() method we make sure that the background light will be turned on:
 
-  // Turn on the background LED
+```C++
   pinMode(TFT_LED, OUTPUT);
   digitalWrite(TFT_LED, HIGH);
+```
 
-  // Initialize the driver only once
+and we initialize the graphic library with gfx.init(). This will also call the driver's init method
+where the driver can execute methods which should only be called once. With gfx.fillBuffer(0) we clear
+the frame buffer and with gfx.commit() we write the content of the frame buffer to the display. This means
+that you usually redraw everything on the screen with every iteration. This is a best practice but there
+are good reasons why you don't want to do this.
+
+```C++
   gfx.init();
-  // fill the buffer with black
   gfx.fillBuffer(0);
-  // write the buffer to the display
   gfx.commit();
-}
+```
 
+Now let's do some drawing in the loop method. Clear the buffer by calling gfx.fillBuffer(0). What would
+happen if you'd call gfx.fillBuffer(1)? This would draw the second color from the palette to the buffer
+which is ILI9341_WHITE.
 
+```C++
 void loop() {
   gfx.fillBuffer(0);
   gfx.setColor(1);
