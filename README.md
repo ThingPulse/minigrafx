@@ -11,4 +11,8 @@ developed by Fabrice Weinberg and myself mostly for tiny OLED displays. This new
 
 ## Getting started
 
-Please have a look here: [Getting Started](Introduction.md)
+[Getting Started](Introduction.md)
+
+## API
+
+[API Documentation](API.md)
