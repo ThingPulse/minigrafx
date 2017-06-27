@@ -12,8 +12,10 @@ Parameters:
 
 ```C++
 MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette);
+```
 
-// Example
+Example:
+```C++
 #define BITS_PER_PIXEL 1
 uint16_t palette[] = {ILI9341_BLACK, // 0
                       ILI9341_WHITE};
@@ -23,6 +25,7 @@ MiniGrafx gfx = MiniGrafx(&tft, BITS_PER_PIXEL, palette);
 ```
 
 ## Basic Operations
+
 
 ```C++
 void commit();
