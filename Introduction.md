@@ -97,6 +97,9 @@ Now let's do some drawing in the loop method. Clear the buffer by calling gfx.fi
 happen if you'd call gfx.fillBuffer(1)? This would draw the second color from the palette to the buffer
 which is ILI9341_WHITE.
 
+After filling the buffer with black pixels we set the color to white and draw a line from (0,0) to
+(20,20). Then we go on and draw a filled circle at the position (20, 20) with radius 5.
+
 ```C++
 void loop() {
   gfx.fillBuffer(0);
@@ -107,10 +110,6 @@ void loop() {
   gfx.commit();
 }
 ```
-
-So what are we doing here? On the first lines we include MiniGrafx header and the driver. The MiniGrafx object
-is responsible for drawing operations, whereas the driver is only responsible for writing the framebuffer to the display.
-
 
 
 And here everything together:
