@@ -61,6 +61,7 @@ class MiniGrafx {
   uint16_t getWidth();
   void setRotation(uint8_t r);
   void setPixel(uint16_t x, uint16_t y);
+  void setPixel90(uint16_t x, uint16_t y);
   uint16_t getPixel(uint16_t x, uint16_t y);
   void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1);
   void setColor(uint16_t color);
@@ -73,6 +74,8 @@ class MiniGrafx {
   void drawVerticalLine(int16_t x, int16_t y, int16_t length);
   void drawString(int16_t xMove, int16_t yMove, String strUser);
   void drawStringInternal(int16_t xMove, int16_t yMove, char* text, uint16_t textLength, uint16_t textWidth);
+  void drawStringInternal90(int16_t xMove, int16_t yMove, char* text, uint16_t textLength, uint16_t textWidth);
+  void drawString90(int16_t xMove, int16_t yMove, String strUser);
   void fillBottomFlatTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3);
   void fillTopFlatTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3);
   void fillTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3);
@@ -82,17 +85,19 @@ class MiniGrafx {
   void drawBmpFromFile(String filename, uint8_t x, uint16_t y);
   void drawBmpFromPgm(const char *xbm, uint8_t x, uint16_t y);
   void drawPalettedBitmapFromPgm(uint16_t x, uint16_t y, const char *palBmp);
-  void invert(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
+
   uint16_t read16(File &f);
   uint32_t read32(File &f);
   void setFont(const char *fontData);
   void setTextAlignment(TEXT_ALIGNMENT textAlignment);
   void inline drawInternal(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *data, uint16_t offset, uint16_t bytesInData);
+  void inline drawInternal90(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *data, uint16_t offset, uint16_t bytesInData);
   void commit();
   void clear();
   void fillBuffer(uint8_t pal);
   static char* utf8ascii(String s);
   static byte utf8ascii(byte ascii);
+  void invert(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 
  private:
   DisplayDriver *driver;
