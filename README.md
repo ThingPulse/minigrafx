@@ -9,6 +9,11 @@ This is a graphics library for embedded devices containing a framebuffer to avoi
 This library is heavily based on another library https://github.com/squix78/esp8266-oled-ssd1306
 developed by Fabrice Weinberg and myself mostly for tiny OLED displays. This new library targets also color displays and e-paper displays with higher resolution
 
+## Philosophy
+
+Often in technology you have to choose between several options and make a trade-off. While some graphic libraries
+are optimized for minimal memory consumption they have to accept ugly visual side effects such as flickering or tearing.
+
 ## Getting started
 
 [Getting Started](Introduction.md)
