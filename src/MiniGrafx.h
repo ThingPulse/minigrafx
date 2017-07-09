@@ -72,6 +72,12 @@ class MiniGrafx {
   void drawHorizontalLine(int16_t x, int16_t y, int16_t length);
   void drawVerticalLine(int16_t x, int16_t y, int16_t length);
   void drawString(int16_t xMove, int16_t yMove, String strUser);
+
+  // Draws a String with a maximum width at the given location.
+  // If the given String is wider than the specified width
+  // The text will be wrapped to the next line at a space or dash
+  void drawStringMaxWidth(int16_t x, int16_t y, uint16_t maxLineWidth, String text);
+
   void drawStringInternal(int16_t xMove, int16_t yMove, char* text, uint16_t textLength, uint16_t textWidth);
   void fillBottomFlatTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3);
   void fillTopFlatTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3);
