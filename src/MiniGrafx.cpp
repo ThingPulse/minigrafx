@@ -1,5 +1,6 @@
 
 #include "MiniGrafx.h"
+
 int16_t txtRotation=0;
 MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette) {
   this->driver = driver;
@@ -442,11 +443,9 @@ void inline MiniGrafx::drawInternal(int16_t xMove, int16_t yMove, int16_t width,
 }
 
 void MiniGrafx::setPixel(uint16_t x, uint16_t y) {
-  float sin_angle;          // Pre-calculate the time consuming sinus
+  float sin_angle;
   float cos_angle; 
   
-  Serial.println("Made it to setPixel90");
-  Serial.println((float)txtRotation);
   switch (txtRotation){
     case 0:
       sin_angle=0;
@@ -490,19 +489,18 @@ void MiniGrafx::setPixel(uint16_t x, uint16_t y) {
   uint16_t newX = (int) (((float)x * cos_angle) - ((float)y * sin_angle));
   uint16_t newY = (int) (((float)y * cos_angle) + ((float)x * sin_angle));
 
-  Serial.print("  sin_angle=");
-  Serial.print(sin_angle);
-  Serial.print("  cos_angle=");
-  Serial.print(cos_angle);
-  Serial.print("  x=");   
-  Serial.print(x);  
-  Serial.print("->");   
-  Serial.print(newX);  
-  Serial.print("  y=");   
-  Serial.print(y);  
-  Serial.print("->");   
-  Serial.println(newY); 
-
+//  Serial.print("  sin_angle=");
+//  Serial.print(sin_angle);
+//  Serial.print("  cos_angle=");
+//  Serial.print(cos_angle);
+//  Serial.print("  x=");   
+//  Serial.print(x);  
+//  Serial.print("->");   
+//  Serial.print(newX);  
+//  Serial.print("  y=");   
+//  Serial.print(y);  
+//  Serial.print("->");   
+//  Serial.println(newY); 
 
   if (newX >= width || newY >= height || newX < 0 || newY < 0 || color < 0 || color > 15 || color == transparentColor) return;
   // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
