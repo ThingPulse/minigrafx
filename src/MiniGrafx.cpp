@@ -1,6 +1,6 @@
 
 #include "MiniGrafx.h"
-
+int16_t txtRotation=0;
 MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette) {
   this->driver = driver;
   this->width = driver->width();
@@ -102,6 +102,28 @@ void MiniGrafx::setRotation(uint8_t m) {
      break;
   }
   this->driver->setRotation(m);
+}
+
+void MiniGrafx::setTextRotation(int16_t r) {
+  int16_t txtAngle=r;
+  Serial.print ("Text Angle=");
+  Serial.println (txtAngle);
+  do
+  {
+    if (txtAngle>=360) txtAngle=txtAngle-360; 
+      Serial.println (txtAngle);
+  }while (txtAngle>360);
+  Serial.println ("made it to 115");
+    do
+  {
+    if (txtAngle<=-360) txtAngle=txtAngle+360; 
+      Serial.println (txtAngle);
+  }while (txtAngle<-360);
+  if (txtAngle<0) txtAngle=360+txtAngle;
+    Serial.println ("made it to 117");
+    txtRotation=txtAngle;
+
+
 }
 
 void MiniGrafx::init() {
@@ -314,87 +336,6 @@ void MiniGrafx::drawStringInternal(int16_t xMove, int16_t yMove, char* text, uin
   }
 }
 
-void MiniGrafx::drawString90(int16_t xMove, int16_t yMove, String strUser) {
-  uint16_t lineHeight = pgm_read_byte(fontData + HEIGHT_POS);
-
-  // char* text must be freed!
-  char* text = utf8ascii(strUser);
-
-  uint16_t yOffset = 0;
-  // If the string should be centered vertically too
-  // we need to now how heigh the string is.
-  if (textAlignment == TEXT_ALIGN_CENTER_BOTH) {
-    uint16_t lb = 0;
-    // Find number of linebreaks in text
-    for (uint16_t i=0;text[i] != 0; i++) {
-      lb += (text[i] == 10);
-    }
-    // Calculate center
-    yOffset = (lb * lineHeight) >> 2;
-  }
-
-  uint16_t line = 0;
-  char* textPart = strtok(text,"\n");
-  while (textPart != NULL) {
-    uint16_t length = strlen(textPart);
-    drawStringInternal90(xMove, yMove - yOffset + (line++) * lineHeight, textPart, length, getStringWidth(textPart, length));
-    textPart = strtok(NULL, "\n");
-  }
-  free(text);
-}
-
-void MiniGrafx::drawStringInternal90(int16_t xMove, int16_t yMove, char* text, uint16_t textLength, uint16_t textWidth) {
-  uint8_t textHeight       = pgm_read_byte(fontData + HEIGHT_POS);
-  uint8_t firstChar        = pgm_read_byte(fontData + FIRST_CHAR_POS);
-  uint16_t sizeOfJumpTable = pgm_read_byte(fontData + CHAR_NUM_POS)  * JUMPTABLE_BYTES;
-
-  uint8_t cursorX         = 0;
-  uint8_t cursorY         = 0;
-
-  switch (textAlignment) {
-    case TEXT_ALIGN_CENTER_BOTH:
-      yMove -= textHeight >> 1;
-    // Fallthrough
-    case TEXT_ALIGN_CENTER:
-      xMove -= textWidth >> 1; // divide by 2
-      break;
-    case TEXT_ALIGN_RIGHT:
-      xMove -= textWidth;
-      break;
-  }
-
-  // Don't draw anything if it is not on the screen.
-  if (xMove + textWidth  < 0 || xMove > this->width ) {return;}
-  if (yMove + textHeight < 0 || yMove > this->height) {return;}
-
-  for (uint16_t j = 0; j < textLength; j++) {
-    int16_t xPos = xMove + cursorX; 
-    int16_t yPos = yMove + cursorY; 
-
-    byte code = text[j];
-    if (code >= firstChar) {
-      byte charCode = code - firstChar;
-
-      // 4 Bytes per char code
-      byte msbJumpToChar    = pgm_read_byte( fontData + JUMPTABLE_START + charCode * JUMPTABLE_BYTES );                  // MSB  \ JumpAddress
-      byte lsbJumpToChar    = pgm_read_byte( fontData + JUMPTABLE_START + charCode * JUMPTABLE_BYTES + JUMPTABLE_LSB);   // LSB /
-      byte charByteSize     = pgm_read_byte( fontData + JUMPTABLE_START + charCode * JUMPTABLE_BYTES + JUMPTABLE_SIZE);  // Size
-      byte currentCharWidth = pgm_read_byte( fontData + JUMPTABLE_START + charCode * JUMPTABLE_BYTES + JUMPTABLE_WIDTH); // Width
-
-      // Test if the char is drawable
-      if (!(msbJumpToChar == 255 && lsbJumpToChar == 255)) {
-        // Get the position of the char data
-        uint16_t charDataPosition = JUMPTABLE_START + sizeOfJumpTable + ((msbJumpToChar << 8) + lsbJumpToChar);
-        drawInternal90(xPos, yPos, currentCharWidth, textHeight, fontData, charDataPosition, charByteSize);
-      }
-
-      cursorX += currentCharWidth;
-    }
-  }
-}
-
-
-
 void MiniGrafx::setFont(const char *fontData) {
   this->fontData = fontData;
 }
@@ -500,69 +441,55 @@ void inline MiniGrafx::drawInternal(int16_t xMove, int16_t yMove, int16_t width,
   }
 }
 
-void inline MiniGrafx::drawInternal90(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *data, uint16_t offset, uint16_t bytesInData) {
-  if (width < 0 || height < 0) return;
-  if (yMove + height < 0 || yMove > this->height)  return;
-  if (xMove + width  < 0 || xMove > this->width)   return;
-
-  uint8_t  rasterHeight = 1 + ((height - 1) >> 3); // fast ceil(height / 8.0)
-  int8_t   yOffset      = yMove & 7;
-
-  bytesInData = bytesInData == 0 ? width * rasterHeight : bytesInData;
-
-  int16_t initYMove   = yMove;
-  int8_t  initYOffset = yOffset;
-
-  uint8_t arrayHeight = (int) ceil(height / 8.0);
-  for (uint16_t i = 0; i < bytesInData; i++) {
-    byte currentByte = pgm_read_byte(data + offset + i);
-
-    for (int b = 0; b < 8; b++) {
-      if(bitRead(currentByte, b)) {
-        uint16_t currentBit = i * 8 + b;
-        uint16_t pixelX = (i / arrayHeight);
-        uint16_t pixelY = (i % arrayHeight) * 8;
-        setPixel90((pixelX + xMove), pixelY + yMove + b);
-      }
-    }
-    yield();
-
-  }
-}
-
 void MiniGrafx::setPixel(uint16_t x, uint16_t y) {
-  if (x >= width || y >= height || x < 0 || y < 0 || color < 0 || color > 15 || color == transparentColor) return;
-  // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
-  // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
-  // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
-  // bitsPerPixel  1, pixPerByte: 8, 3  8 = 2^3
-  uint16_t pos = (y * width + x) >> bitShift;
-  if (pos > bufferSize) {
-    return;
+  float sin_angle;          // Pre-calculate the time consuming sinus
+  float cos_angle; 
+  
+  Serial.println("Made it to setPixel90");
+  Serial.println((float)txtRotation);
+  switch (txtRotation){
+    case 0:
+      sin_angle=0;
+      cos_angle=1;
+    break;
+    case 45:
+      sin_angle=0.707106781;
+      cos_angle=0.707106781;
+    break;
+    case 90:
+      sin_angle=1;
+      cos_angle=0;
+    break;
+    case 135:
+      sin_angle=0.707106781;
+      cos_angle=-0.707106781;
+    break;
+    case 180:
+      sin_angle=0;
+      cos_angle=-1;
+    break;
+    case 225:
+      sin_angle=-0.707106781;
+      cos_angle=-0.707106781;
+    break;
+    case 270:
+      sin_angle=-1;
+      cos_angle=0;
+    break;
+    case 315:
+      sin_angle=-0.707106781;
+      cos_angle=0.707106781;
+    break;
+    default: //compute sin and cos if not a cardinal direction.
+      float angle_rad=2.0*3.1415/360.0*(float)txtRotation; //convert degrees to radians
+      sin_angle = sin (angle_rad);          // Pre-calculate the time consuming sinus
+      cos_angle = cos (angle_rad);          // Pre-calculate the time consuming cosinus
+    break;
   }
 
-  uint8_t shift = (x & (pixelsPerByte - 1)) * bitsPerPixel;
-  // x: 0 % 2 * 4 = 0
-  // x: 1 % 2 * 4 = 0
-
-  //uint8_t shift = ((x) % (pixelsPerByte)) * bitsPerPixel;
-  //uint8_t shift = 0;
-  uint8_t mask = bitMask << shift;
-  uint8_t palColor = color;
-  palColor = palColor << shift;
-  buffer[pos] = (buffer[pos] & ~mask) | (palColor & mask);
-}
-
-void MiniGrafx::setPixel90(uint16_t x, uint16_t y) {
-
-  uint16_t angle_deg=350;
-  float angle_rad=2.0*3.1415/360.0*(float)angle_deg;
-  float sin_angle = sin (angle_rad);          // Pre-calculate the time consuming sinus
-  float cos_angle = cos (angle_rad);          // Pre-calculate the time consuming cosinus
   uint16_t newX = (int) (((float)x * cos_angle) - ((float)y * sin_angle));
   uint16_t newY = (int) (((float)y * cos_angle) + ((float)x * sin_angle));
-  Serial.print("radians=");
-  Serial.print(angle_rad);
+
   Serial.print("  sin_angle=");
   Serial.print(sin_angle);
   Serial.print("  cos_angle=");
