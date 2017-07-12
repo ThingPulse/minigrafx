@@ -89,7 +89,6 @@ class MiniGrafx {
   void setFont(const char *fontData);
   void setTextAlignment(TEXT_ALIGNMENT textAlignment);
   void inline drawInternal(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *data, uint16_t offset, uint16_t bytesInData);
-  void inline drawInternal90(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *data, uint16_t offset, uint16_t bytesInData);
   void commit();
   void clear();
   void fillBuffer(uint8_t pal);
