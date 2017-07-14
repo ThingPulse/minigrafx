@@ -322,7 +322,7 @@ void MiniGrafx::drawString(int16_t xMove, int16_t yMove, String strUser) {
   char* textPart = strtok(text,"\n");
   while (textPart != NULL) {
     uint16_t length = strlen(textPart);
-    drawStringInternal((xMove, yMove - yOffset + (line++) * lineHeight, textPart, length, getStringWidth(textPart, length));
+    drawStringInternal(xMove, yMove - yOffset + (line++) * lineHeight, textPart, length, getStringWidth(textPart, length));
     textPart = strtok(NULL, "\n");
   }
   free(text);
@@ -487,19 +487,6 @@ void MiniGrafx::setPixel(uint16_t x, uint16_t y) {
 
   uint16_t newX = (int) (((float)x * cos_angle) - ((float)y * sin_angle));
   uint16_t newY = (int) (((float)y * cos_angle) + ((float)x * sin_angle));
-
-//  Serial.print("  sin_angle=");
-//  Serial.print(sin_angle);
-//  Serial.print("  cos_angle=");
-//  Serial.print(cos_angle);
-//  Serial.print("  x=");   
-//  Serial.print(x);  
-//  Serial.print("->");   
-//  Serial.print(newX);  
-//  Serial.print("  y=");   
-//  Serial.print(y);  
-//  Serial.print("->");   
-//  Serial.println(newY); 
 
   if (newX >= width || newY >= height || newX < 0 || newY < 0 || color < 0 || color > 15 || color == transparentColor) return;
   // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
