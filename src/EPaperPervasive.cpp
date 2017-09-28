@@ -48,14 +48,14 @@ EPD_Class::EPD_Class(EPD_size size,
          int discharge_pin,
          int reset_pin,
          int busy_pin,
-         int chip_select_pin) :
+         int chip_select_pin) : 
+         DisplayDriver(width, height),
   EPD_Pin_PANEL_ON(panel_on_pin),
   EPD_Pin_BORDER(border_pin),
   EPD_Pin_DISCHARGE(discharge_pin),
   EPD_Pin_RESET(reset_pin),
   EPD_Pin_BUSY(busy_pin),
-  EPD_Pin_EPD_CS(chip_select_pin),
-  DisplayDriver(width, height) {
+  EPD_Pin_EPD_CS(chip_select_pin) {
 
   this->size = size;
   this->lines_per_display = 96;

@@ -28,69 +28,53 @@ See more at https://blog.squix.org
 Demo for the buffered graphics library. Renders a 3D cube
 */
 
-#include <SPI.h>
-#include "MiniGrafx.h" // General graphic library
-#include "ILI9341_SPI.h" // Hardware-specific library
-#include "image.h"
 
-#define TFT_DC D2
-#define TFT_CS D1
-#define TFT_LED D8
-
-// defines the colors usable in the paletted 16 color frame buffer
-uint16_t palette[] = {ILI9341_BLACK, // 0
-                      ILI9341_WHITE}; // 15
+#include "EPD_WaveShare_43.h"
+#include "MiniGrafx.h"
+#include "DisplayDriver.h"
 
 
 
-int SCREEN_WIDTH = 240;
-int SCREEN_HEIGHT = 320;
-int BITS_PER_PIXEL = 1 ; // 2^4 = 16 colors
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
+#define BITS_PER_PIXEL 1
 
-// Initialize the driver
-ILI9341_SPI tft = ILI9341_SPI(TFT_CS, TFT_DC);
-MiniGrafx gfx = MiniGrafx(&tft, BITS_PER_PIXEL, palette);
+const int wake_up = 18;
+const int reset = 19;
 
+uint16_t palette[] = {0, 1};
 
-// Used for fps measuring
-uint16_t counter = 0;
-long startMillis = millis();
-uint16_t interval = 20;
-int color = 1;
-String fps = "0fps";
+HardwareSerial mySerial(2);
+EPD_WaveShare_43 epd(&mySerial);
+MiniGrafx gfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette);
 
 void setup() {
-  Serial.begin(115200);
-
-  // Turn on the background LED
-  pinMode(TFT_LED, OUTPUT);
-  digitalWrite(TFT_LED, HIGH);
-  
+  pinMode(wake_up, HIGH);
+  pinMode(reset, HIGH);
   gfx.init();
-  gfx.fillBuffer(0);
-  gfx.commit();
-
-
-  startMillis = millis();
+  
 }
 
+uint8_t rotation = 0;
 
 void loop() {
+  //epd.Dis_Clear_full();
+  //delay(1500);
+  //epd.EPD_init_Part();
+  //delay(1000);
 
-  gfx.fillBuffer(0);
-
-  gfx.setColor(15);
-  gfx.drawString(2, 2, fps);
-  gfx.setTransparentColor(0);
-  gfx.drawPalettedBitmapFromPgm(0, -100 + counter % 420, img);
+  //gfx.init();
+  gfx.setRotation(rotation);
+  gfx.fillBuffer(1);
+  gfx.setColor(0);
+  gfx.setFont(ArialMT_Plain_10);
+  gfx.drawLine(0, 0, gfx.getWidth(), gfx.getHeight());
+  gfx.drawString(10, 10, "Hello World");
+  gfx.setFont(ArialMT_Plain_16);
+  gfx.drawString(10, 30, "Everything works!");
+  gfx.setFont(ArialMT_Plain_24);
+  gfx.drawString(10, 55, "Yes! Millis: " + String(millis()));
   gfx.commit();
-
-  counter++;
-  // only calculate the fps every <interval> iterations.
-  if (counter % interval == 0) {
-    color = (color + 1) % 15 + 1;
-    long millisSinceUpdate = millis() - startMillis;
-    fps = String(interval * 1000.0 / (millisSinceUpdate)) + "fps";
-    startMillis = millis();
-  }
+  delay(5000);
+  rotation = (rotation + 1) % 4;
 }

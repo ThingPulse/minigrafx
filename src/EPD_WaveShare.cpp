@@ -40,6 +40,7 @@ int EPD_WaveShare::getWidth(EPD_TYPE epdType) {
     case EPD2_9:
       return 128;
   }
+  return 0;
 }
 
 int EPD_WaveShare::getHeight(EPD_TYPE epdType) {
@@ -51,6 +52,7 @@ int EPD_WaveShare::getHeight(EPD_TYPE epdType) {
     case EPD2_9:
       return 296;
   }
+  return 0;
 }
 
 void EPD_WaveShare::setRotation(uint8_t r) {
@@ -175,7 +177,7 @@ uint8_t EPD_WaveShare::getPixel(uint8_t *buffer, uint16_t x, uint16_t y) {
   uint8_t pixelsPerByte = 8 / bitsPerPixel;
   uint8_t bitShift = 3;
 
-  if (x >= bufferWidth || y >= bufferHeight || x < 0 || y < 0) return 0;
+  if (x >= bufferWidth || y >= bufferHeight) return 0;
   // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
   // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
   // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2

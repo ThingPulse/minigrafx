@@ -281,6 +281,11 @@ void Carousel::drawFrame(){
           x1 = 0;
           y1 = y - this->height;
           break;
+         default:
+          x = 0;
+          y = 0;
+          x1 = 0;
+          y1 = 0;
        }
 
        // Invert animation if direction is reversed.
@@ -351,6 +356,8 @@ void Carousel::drawIndicator() {
       case RIGHT_LEFT:
         posOfHighlightFrame = this->frameCount - frameToHighlight;
         break;
+      default:
+        posOfHighlightFrame = 0;
     }
 
     switch (this->indicatorDrawState) {
@@ -386,6 +393,9 @@ void Carousel::drawIndicator() {
           x = 0 - (8 * indicatorFadeProgress);
           y = this->height / 2 - frameStartPos + 2 + 12 * i;
           break;
+        default:
+          x = 0;
+          y = 0;
       }
 
       if (posOfHighlightFrame == i) {

@@ -319,6 +319,8 @@ void MiniGrafx::drawStringInternal(int16_t xMove, int16_t yMove, char* text, uin
   uint8_t cursorY         = 0;
 
   switch (textAlignment) {
+    case TEXT_ALIGN_LEFT:
+      break;
     case TEXT_ALIGN_CENTER_BOTH:
       yMove -= textHeight >> 1;
     // Fallthrough
@@ -522,7 +524,7 @@ void MiniGrafx::commit() {
 
 void MiniGrafx::drawXbm(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *xbm) {
   int16_t widthInXbm = (width + 7) >> 3;
-  uint8_t data;
+  uint8_t data = 0;
 
   for(int16_t y = 0; y < height; y++) {
     for(int16_t x = 0; x < width; x++ ) {
@@ -566,7 +568,7 @@ void MiniGrafx::drawBmpFromFile(String filename, uint8_t x, uint16_t y) {
   Serial.print(filename);
   Serial.println('\'');*/
 
-  bmpFile = SPIFFS.open(filename, "r");
+  //bmpFile = SPIFFS.open(filename, "r");
   // Open requested file on SD card
   if (!bmpFile) {
     Serial.print(F("File not found"));

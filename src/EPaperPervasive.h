@@ -56,49 +56,6 @@ const uint8_t EPD_BORDER_BYTE_NULL  = 0x00;
 typedef void EPD_reader(void *buffer, uint32_t address, uint16_t length);
 
 class EPD_Class : public DisplayDriver {
-private:
-  int EPD_Pin_PANEL_ON;
-  int EPD_Pin_BORDER;
-  int EPD_Pin_DISCHARGE;
-  int EPD_Pin_RESET;
-  int EPD_Pin_BUSY;
-  int EPD_Pin_EPD_CS;
-
-  EPD_size size;
-  uint16_t lines_per_display;
-  uint16_t dots_per_line;
-  uint16_t bytes_per_line;
-  uint16_t bytes_per_scan;
-
-  uint8_t voltage_level;
-
-  EPD_error status;
-
-  const uint8_t *channel_select;
-  uint16_t channel_select_length;
-
-  typedef struct {
-    uint16_t stage1_repeat;
-    uint16_t stage1_step;
-    uint16_t stage1_block;
-    uint16_t stage2_repeat;
-    uint16_t stage2_t1;
-    uint16_t stage2_t2;
-    uint16_t stage3_repeat;
-    uint16_t stage3_step;
-    uint16_t stage3_block;
-  } compensation_type;
-
-  const compensation_type *compensation;
-  uint16_t temperature_offset;
-
-  EPD_Class(const EPD_Class &f);  // prevent copy
-
-  void power_off();
-  void nothing_frame();
-  void dummy_line();
-  void border_dummy_line();
-
 public:
   // power up and power down the EPD panel
   void init();
@@ -106,7 +63,7 @@ public:
 
   void setFactor(int temperature = 25);
 
-  const bool operator!() const {
+  bool operator!() const {
     return EPD_OK != this->status;
   }
 
@@ -188,6 +145,56 @@ public:
       int reset_pin,
       int busy_pin,
       int chip_select_pin);
+
+private:
+  /*int EPD_Pin_PANEL_ON = 0;
+  int EPD_Pin_BORDER  = 0;
+  int EPD_Pin_DISCHARGE  = 0;
+  int EPD_Pin_RESET  = 0;
+  int EPD_Pin_BUSY  = 0;
+  int EPD_Pin_EPD_CS  = 0;*/
+  int EPD_Pin_PANEL_ON;
+  int EPD_Pin_BORDER;
+  int EPD_Pin_DISCHARGE;
+  int EPD_Pin_RESET;
+  int EPD_Pin_BUSY;
+  int EPD_Pin_EPD_CS;
+
+  EPD_size size;
+  uint16_t lines_per_display;
+  uint16_t dots_per_line;
+  uint16_t bytes_per_line;
+  uint16_t bytes_per_scan;
+
+  uint8_t voltage_level;
+
+  EPD_error status;
+
+  const uint8_t *channel_select;
+  uint16_t channel_select_length;
+
+  typedef struct {
+    uint16_t stage1_repeat;
+    uint16_t stage1_step;
+    uint16_t stage1_block;
+    uint16_t stage2_repeat;
+    uint16_t stage2_t1;
+    uint16_t stage2_t2;
+    uint16_t stage3_repeat;
+    uint16_t stage3_step;
+    uint16_t stage3_block;
+  } compensation_type;
+
+  const compensation_type *compensation;
+  uint16_t temperature_offset;
+
+  EPD_Class(const EPD_Class &f);  // prevent copy
+
+  void power_off();
+  void nothing_frame();
+  void dummy_line();
+  void border_dummy_line();
+
 
 };
 
