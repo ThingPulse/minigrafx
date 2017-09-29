@@ -1,6 +1,9 @@
 
 #include "MiniGrafx.h"
 
+int16_t txtRotation=0;
+float sin_angle=0;
+float cos_angle=1; 
 MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette) {
   this->driver = driver;
   this->width = driver->width();
@@ -102,6 +105,67 @@ void MiniGrafx::setRotation(uint8_t m) {
      break;
   }
   this->driver->setRotation(m);
+}
+
+void MiniGrafx::setTextRotation(int16_t r) {
+  int16_t txtAngle=r;
+  Serial.print ("Text Angle=");
+  Serial.println (txtAngle);
+  do
+  {
+    if (txtAngle>=360) txtAngle=txtAngle-360; 
+      Serial.println (txtAngle);
+  }while (txtAngle>360);
+  Serial.println ("made it to 115");
+    do
+  {
+    if (txtAngle<=-360) txtAngle=txtAngle+360; 
+      Serial.println (txtAngle);
+  }while (txtAngle<-360);
+  if (txtAngle<0) txtAngle=360+txtAngle;
+    Serial.println ("made it to 117");
+    txtRotation=txtAngle;
+ 
+  switch (txtRotation){
+    case 0:
+      sin_angle=0;
+      cos_angle=1;
+    break;
+    case 45:
+      sin_angle=0.707106781;
+      cos_angle=0.707106781;
+    break;
+    case 90:
+      sin_angle=1;
+      cos_angle=0;
+    break;
+    case 135:
+      sin_angle=0.707106781;
+      cos_angle=-0.707106781;
+    break;
+    case 180:
+      sin_angle=0;
+      cos_angle=-1;
+    break;
+    case 225:
+      sin_angle=-0.707106781;
+      cos_angle=-0.707106781;
+    break;
+    case 270:
+      sin_angle=-1;
+      cos_angle=0;
+    break;
+    case 315:
+      sin_angle=-0.707106781;
+      cos_angle=0.707106781;
+    break;
+    default: //compute sin and cos if not a cardinal direction.
+      float angle_rad=2.0*3.1415/360.0*(float)txtRotation; //convert degrees to radians
+      sin_angle = sin (angle_rad);          // Pre-calculate the time consuming sin
+      cos_angle = cos (angle_rad);          // Pre-calculate the time consuming cosine
+    break;
+  }
+
 }
 
 void MiniGrafx::init() {
@@ -237,7 +301,7 @@ void MiniGrafx::drawVerticalLine(int16_t x, int16_t y, int16_t length) {
 
 void MiniGrafx::drawString(int16_t xMove, int16_t yMove, String strUser) {
   uint16_t lineHeight = pgm_read_byte(fontData + HEIGHT_POS);
-
+  
   // char* text must be freed!
   char* text = utf8ascii(strUser);
 
@@ -468,17 +532,21 @@ void inline MiniGrafx::drawInternal(int16_t xMove, int16_t yMove, int16_t width,
 }
 
 void MiniGrafx::setPixel(uint16_t x, uint16_t y) {
-  if (x >= width || y >= height || x < 0 || y < 0 || color < 0 || color > 15 || color == transparentColor) return;
+
+  uint16_t newX = (int) (((float)x * cos_angle) - ((float)y * sin_angle));
+  uint16_t newY = (int) (((float)y * cos_angle) + ((float)x * sin_angle));
+
+  if (newX >= width || newY >= height || newX < 0 || newY < 0 || color < 0 || color > 15 || color == transparentColor) return;
   // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
   // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
   // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
   // bitsPerPixel  1, pixPerByte: 8, 3  8 = 2^3
-  uint16_t pos = (y * width + x) >> bitShift;
+  uint16_t pos = (newY * width + newX) >> bitShift;
   if (pos > bufferSize) {
     return;
   }
 
-  uint8_t shift = (x & (pixelsPerByte - 1)) * bitsPerPixel;
+  uint8_t shift = (newX & (pixelsPerByte - 1)) * bitsPerPixel;
   // x: 0 % 2 * 4 = 0
   // x: 1 % 2 * 4 = 0
 
@@ -967,4 +1035,21 @@ void MiniGrafx::drawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2,
   drawLine(x1, y1, x2, y2);
   drawLine(x2, y2, x3, y3);
   drawLine(x3, y3, x1, y1);
+}
+
+void MiniGrafx::invert(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
+   uint16_t pix;
+  for (int y=y1; y<y2; y++){
+    for (int x=x1; x < x2; x++){
+      pix = getPixel(x, y);
+      if (pix==0){
+        setColor(1);
+        setPixel(x, y);
+      }
+      else{
+        setColor(0);
+        setPixel(x, y);
+      }
+    }
+  }
 }

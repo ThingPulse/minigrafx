@@ -60,6 +60,7 @@ class MiniGrafx {
   uint16_t getHeight();
   uint16_t getWidth();
   void setRotation(uint8_t r);
+  void setTextRotation(int16_t r);
   void setPixel(uint16_t x, uint16_t y);
   uint16_t getPixel(uint16_t x, uint16_t y);
   void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1);
@@ -99,6 +100,7 @@ class MiniGrafx {
   void fillBuffer(uint8_t pal);
   static char* utf8ascii(String s);
   static byte utf8ascii(byte ascii);
+  void invert(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 
  private:
   DisplayDriver *driver;
