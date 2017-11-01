@@ -28,40 +28,64 @@ See more at https://blog.squix.org
 Demo for the buffered graphics library. Renders a 3D cube
 */
 
-#ifndef _MINIGRAFX_DRIVER_H
-#define _MINIGRAFX_DRIVER_H
+#include <SPI.h>
+#include "EPD_WaveShare_42.h"
+#include "MiniGrafx.h"
+#include "DisplayDriver.h"
 
-#if ARDUINO >= 100
- #include "Arduino.h"
+/*
+ Connect the following pins:
+ Display  NodeMCU
+ BUSY     D1
+ RST      D2
+ DC       D8
+ CS       D3
+ CLK      D5
+ DIN      D7
+ GND      GND
+ 3.3V     3V3
+*/
+/*#define CS D3
+#define RST D2
+#define DC D8
+#define BUSY D1*/
 
-#else
- #include "WProgram.h"
-#endif
+#define CS 15  // D8
+#define RST 2  // D4
+#define DC 5   // D1
+#define BUSY 4 // D2
 
-
-class DisplayDriver {
-
- public:
-
-  DisplayDriver(int16_t w, int16_t h); // Constructor
-
-  virtual void setRotation(uint8_t r);
-  virtual void init() = 0;
-  virtual void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) = 0;
-
-  int16_t height(void) const;
-  int16_t width(void) const;
-
-  uint8_t getRotation(void) const;
-
-
- protected:
-  const int16_t
-    WIDTH, HEIGHT;   // This is the 'raw' display w/h - never changes
-  int16_t _width, _height;
-  uint8_t rotation;
-
-};
+#define SCREEN_WIDTH 400
+#define SCREEN_HEIGHT 300
+#define BITS_PER_PIXEL 1
 
 
-#endif // _MINIGRAFX_DRIVER_H
+uint16_t palette[] = {0, 1};
+
+EPD_WaveShare42 epd(CS, RST, DC, BUSY);
+MiniGrafx gfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette);
+
+void setup() {
+  Serial.begin(115200);
+  gfx.init();
+
+}
+
+uint8_t rotation = 0;
+
+void loop() {
+
+
+  gfx.fillBuffer(1);
+  gfx.setColor(0);
+  gfx.setFont(ArialMT_Plain_10);
+  gfx.drawLine(0, 0, gfx.getWidth(), gfx.getHeight());
+  gfx.drawString(10, 10, "Hello World");
+  gfx.setFont(ArialMT_Plain_16);
+  gfx.drawString(10, 30, "Everything works!");
+  gfx.setFont(ArialMT_Plain_24);
+  gfx.drawString(10, 55, "Yes! Millis: " + String(millis()));
+  gfx.commit();
+  delay(15000);
+
+}

@@ -1,12 +1,41 @@
+/**
+The MIT License (MIT)
+Copyright (c) 2017 by Daniel Eichhorn
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Please note: I am spending a lot of my free time in developing Software and Hardware
+for these projects. Please consider supporting me by
+a) Buying my hardware kits from https://blog.squix.org/shop
+b) Send a donation: https://www.paypal.me/squix/5USD
+c) Or using this affiliate link while shopping: https://www.banggood.com/?p=6R31122484684201508S
+
+See more at https://blog.squix.org
+
+This code is based on a driver from http://waveshare.com
+*/
+
+#include <FS.h>
 #include "ILI9341_SPI.h"
 #include "MiniGrafxFonts.h"
-#include <FS.h>
+
 
 
 #ifndef _MINI_GRAFXH_
 #define _MINI_GRAFXH_
-
-//#define DEBUG_MINI_GRAFX(...) Serial.printf( __VA_ARGS__ )
 
 #ifndef DEBUG_MINI_GRAFX
 #define DEBUG_MINI_GRAFX(...)
@@ -88,10 +117,12 @@ class MiniGrafx {
   void drawBmpFromFile(String filename, uint8_t x, uint16_t y);
   void drawBmpFromPgm(const char *xbm, uint8_t x, uint16_t y);
   void drawPalettedBitmapFromPgm(uint16_t x, uint16_t y, const char *palBmp);
+  void drawPalettedBitmapFromFile(uint16_t x, uint16_t y, String fileName);
 
   uint16_t read16(File &f);
   uint32_t read32(File &f);
   void setFont(const char *fontData);
+  void setFontFile(String fontFile);
   void setTextAlignment(TEXT_ALIGNMENT textAlignment);
   void inline drawInternal(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *data, uint16_t offset, uint16_t bytesInData);
   void commit();
@@ -102,6 +133,7 @@ class MiniGrafx {
 
  private:
   DisplayDriver *driver;
+  File fontFile;
   uint16_t width, height;
   uint16_t color;
   uint8_t rotation;
@@ -113,8 +145,10 @@ class MiniGrafx {
   uint8_t *buffer = 0;
   uint8_t bitMask;
   uint8_t pixelsPerByte;
+  boolean isPgmFont = true;
   const char *fontData = ArialMT_Plain_16;
   TEXT_ALIGNMENT textAlignment;
+  uint8_t readFontData(const char * start, uint32_t offset);
 
 };
 

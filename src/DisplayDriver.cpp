@@ -1,73 +1,35 @@
-/*
-This is the core graphics library for all our displays, providing a common
-set of graphics primitives (points, lines, circles, etc.).  It needs to be
-paired with a hardware-specific library for each display device we carry
-(to handle the lower-level functions).
+/**
+The MIT License (MIT)
+Copyright (c) 2017 by Daniel Eichhorn
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
-Adafruit invests time and resources providing this open source code, please
-support Adafruit & open-source hardware by purchasing products from Adafruit!
+Please note: I am spending a lot of my free time in developing Software and Hardware
+for these projects. Please consider supporting me by
+a) Buying my hardware kits from https://blog.squix.org/shop
+b) Send a donation: https://www.paypal.me/squix/5USD
+c) Or using this affiliate link while shopping: https://www.banggood.com/?p=6R31122484684201508S
 
-Copyright (c) 2013 Adafruit Industries.  All rights reserved.
+See more at https://blog.squix.org
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-- Redistributions of source code must retain the above copyright notice,
-  this list of conditions and the following disclaimer.
-- Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
- */
+Many thanks go to various contributors such as Adafruit, Waveshare.
+*/
 
 #include "DisplayDriver.h"
-#ifdef __AVR__
-  #include <avr/pgmspace.h>
-#elif defined(ESP8266) || defined(ESP32)
-  #include <pgmspace.h>
-#endif
 
-// Many (but maybe not all) non-AVR board installs define macros
-// for compatibility with existing PROGMEM-reading AVR code.
-// Do our own checks and defines here for good measure...
-
-#ifndef pgm_read_byte
- #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-#endif
-#ifndef pgm_read_word
- #define pgm_read_word(addr) (*(const unsigned short *)(addr))
-#endif
-#ifndef pgm_read_dword
- #define pgm_read_dword(addr) (*(const unsigned long *)(addr))
-#endif
-
-// Pointers are a peculiar case...typically 16-bit on AVR boards,
-// 32 bits elsewhere.  Try to accommodate both...
-
-#if !defined(__INT_MAX__) || (__INT_MAX__ > 0xFFFF)
- #define pgm_read_pointer(addr) ((void *)pgm_read_dword(addr))
-#else
- #define pgm_read_pointer(addr) ((void *)pgm_read_word(addr))
-#endif
-
-#ifndef min
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif
-
-#ifndef _swap_int16_t
-#define _swap_int16_t(a, b) { int16_t t = a; a = b; b = t; }
-#endif
 
 DisplayDriver::DisplayDriver(int16_t w, int16_t h):
 WIDTH(w), HEIGHT(h)
@@ -75,11 +37,6 @@ WIDTH(w), HEIGHT(h)
     _width    = WIDTH;
     _height   = HEIGHT;
     rotation  = 0;
-    cursor_y  = cursor_x    = 0;
-    textsize  = 1;
-    textcolor = textbgcolor = 0xFFFF;
-    wrap      = true;
-    _cp437    = false;
 
 }
 
@@ -113,6 +70,3 @@ int16_t DisplayDriver::width(void) const {
 int16_t DisplayDriver::height(void) const {
     return _height;
 }
-
-/***************************************************************************/
-// code for the GFX button UI element

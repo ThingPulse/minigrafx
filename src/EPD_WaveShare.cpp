@@ -1,7 +1,34 @@
+/**
+The MIT License (MIT)
+Copyright (c) 2017 by Daniel Eichhorn
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Please note: I am spending a lot of my free time in developing Software and Hardware
+for these projects. Please consider supporting me by
+a) Buying my hardware kits from https://blog.squix.org/shop
+b) Send a donation: https://www.paypal.me/squix/5USD
+c) Or using this affiliate link while shopping: https://www.banggood.com/?p=6R31122484684201508S
+
+See more at https://blog.squix.org
+
+This code is based on a driver from http://waveshare.com
+*/
+
 #include "EPD_WaveShare.h"
-
-
-
 
 EPD_WaveShare::EPD_WaveShare(EPD_TYPE epdType, uint8_t csPin, uint8_t rstPin, uint8_t dcPin, uint8_t busyPin) : DisplayDriver(getWidth(epdType), getHeight(epdType))  {
   this->csPin = csPin;
@@ -83,7 +110,7 @@ void EPD_WaveShare::init() {
   pinMode(busyPin,INPUT);
 
   Serial.begin(115200);
-  SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+  SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
   SPI.begin();
 
   EPD_Init();
@@ -119,7 +146,7 @@ void EPD_WaveShare::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t 
   uint16_t XSize = xDot;
   uint16_t YSize = yDot;
   EPD_SetRamPointer(0x00,(yDot-1)%256,(yDot-1)/256);	// set ram
-  Serial.println(">>>>>>------start send display data!!---------<<<<<<<");
+  //Serial.println(">>>>>>------start send display data!!---------<<<<<<<");
   int i = 0,j = 0;
 	if(XSize%8 != 0){
 		XSize = XSize+(8-XSize%8);
@@ -214,7 +241,7 @@ unsigned char EPD_WaveShare::ReadBusy(void)
   for(i=0;i<400;i++){
 	//	println("isEPD_BUSY = %d\r\n",digitalRead(this->csPin));
       if(digitalRead(this->busyPin)==EPD_BUSY_LEVEL) {
-				Serial.println("Busy is Low \r\n");
+				//Serial.println("Busy is Low \r\n");
       	return 1;
       }
 	  driver_delay_xms(10);
@@ -275,7 +302,7 @@ void EPD_WaveShare::EPD_Write(const unsigned char *value, unsigned char datalen)
 	SPI_Write(*ptemp);	//The first byte is written with the command value
 	ptemp++;
 	digitalWrite (this->dcPin,HIGH);		// When DC is 1, write data
-	Serial.println("send data  :");
+	//Serial.println("send data  :");
 	for(i= 0;i<datalen-1;i++){	// sub the data
 		SPI_Write(*ptemp);
 		ptemp++;
@@ -467,7 +494,7 @@ parameter:
 void EPD_WaveShare::EPD_Dis_Full(unsigned char *DisBuffer,unsigned char Label)
 {
     EPD_SetRamPointer(0x00,(yDot-1)%256,(yDot-1)/256);	// set ram
-	Serial.println(">>>>>>------start send display data!!---------<<<<<<<");
+	//Serial.println(">>>>>>------start send display data!!---------<<<<<<<");
 	if(Label == 0){
 		EPD_WriteDispRamMono(xDot, yDot, 0xff);	// white
 	}else{
@@ -490,7 +517,7 @@ parameter:
 ********************************************************************************/
 void EPD_WaveShare::EPD_Dis_Part(unsigned char xStart,unsigned char xEnd,unsigned long yStart,unsigned long yEnd,unsigned char *DisBuffer,unsigned char Label)
 {
-	Serial.println(">>>>>>------start send display data!!---------<<<<<<<");
+	//Serial.println(">>>>>>------start send display data!!---------<<<<<<<");
 	if(Label==0){// black
 		EPD_part_display(xStart/8,xEnd/8,yEnd%256,yEnd/256,yStart%256,yStart/256);
 		EPD_WriteDispRamMono(xEnd-xStart, yEnd-yStart+1, DisBuffer[0]);
@@ -521,12 +548,12 @@ void EPD_WaveShare::Dis_Clear_full(void)
 {
 	unsigned char m;
 	//init
-	Serial.println("full init");
+	//Serial.println("full init");
 	EPD_init_Full();
 	driver_delay_xms(delaytime);
 
 	//Clear screen
-	Serial.println("full clear\t\n");
+	//Serial.println("full clear\t\n");
 	m=0xff;
 	EPD_Dis_Full((unsigned char *)&m,0);  //all white
 	driver_delay_xms(delaytime);
