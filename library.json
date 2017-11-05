@@ -1,6 +1,6 @@
 {
   "name": "Mini Grafx",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "keywords": "embedded, graphics, tft, oled, e-paper",
   "description": "A generic graphics library containing several drivers for TFT, OLED and e-paper displays",
   "repository":
