@@ -342,8 +342,8 @@ void MiniGrafx::drawStringInternal(int16_t xMove, int16_t yMove, char* text, uin
   uint8_t firstChar        = readFontData(fontData, FIRST_CHAR_POS);
   uint16_t sizeOfJumpTable = readFontData(fontData, CHAR_NUM_POS)  * JUMPTABLE_BYTES;
 
-  uint8_t cursorX         = 0;
-  uint8_t cursorY         = 0;
+  uint16_t cursorX         = 0;
+  uint16_t cursorY         = 0;
 
   switch (textAlignment) {
     case TEXT_ALIGN_LEFT:
@@ -370,7 +370,6 @@ void MiniGrafx::drawStringInternal(int16_t xMove, int16_t yMove, char* text, uin
     byte code = text[j];
     if (code >= firstChar) {
       byte charCode = code - firstChar;
-
       // 4 Bytes per char code
       byte msbJumpToChar    = readFontData( fontData, JUMPTABLE_START + charCode * JUMPTABLE_BYTES );                  // MSB  \ JumpAddress
       byte lsbJumpToChar    = readFontData( fontData, JUMPTABLE_START + charCode * JUMPTABLE_BYTES + JUMPTABLE_LSB);   // LSB /
@@ -410,6 +409,8 @@ void MiniGrafx::setFontFile(String fileName) {
   fontFile = SPIFFS.open(fileName, "r");
   if (!fontFile) {
     Serial.println("Could not open font file " + fileName);
+  } else {
+    Serial.println("Set font file " + fileName);
   }
 }
 
@@ -485,6 +486,7 @@ uint16_t MiniGrafx::getStringWidth(const char* text, uint16_t length) {
 }
 
 void inline MiniGrafx::drawInternal(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *data, uint16_t offset, uint16_t bytesInData) {
+
   if (width < 0 || height < 0) return;
   if (yMove + height < 0 || yMove > this->height)  return;
   if (xMove + width  < 0 || xMove > this->width)   return;
