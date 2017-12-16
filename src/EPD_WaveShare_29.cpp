@@ -66,7 +66,7 @@ void EPD_WaveShare29::setRotation(uint8_t r) {
   }
 }
 void EPD_WaveShare29::init() {
-  Init(lut_partial_update);
+  Init(lut_full_update);
 }
 
 void EPD_WaveShare29::setFastRefresh(boolean isFastRefreshEnabled) {
