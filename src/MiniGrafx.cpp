@@ -571,6 +571,10 @@ void MiniGrafx::commit() {
   this->driver->writeBuffer(buffer, bitsPerPixel, palette);
 }
 
+void MiniGrafx::setFastRefresh(boolean isFastRefreshEnabled) {
+  this->driver->setFastRefresh(isFastRefreshEnabled);
+}
+
 void MiniGrafx::drawXbm(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *xbm) {
   int16_t widthInXbm = (width + 7) >> 3;
   uint8_t data = 0;

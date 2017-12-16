@@ -104,7 +104,7 @@ class EPD_WaveShare_43 : public DisplayDriver {
 
   void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette);
   void setBaud(long baud);
-
+  void setFastRefresh(boolean isFastRefreshEnabled);
 
 
 

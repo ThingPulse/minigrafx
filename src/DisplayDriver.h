@@ -48,6 +48,7 @@ class DisplayDriver {
   virtual void setRotation(uint8_t r);
   virtual void init() = 0;
   virtual void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) = 0;
+  virtual void setFastRefresh(boolean isEnabled) = 0;
 
   int16_t height(void) const;
   int16_t width(void) const;
@@ -60,6 +61,7 @@ class DisplayDriver {
     WIDTH, HEIGHT;   // This is the 'raw' display w/h - never changes
   int16_t _width, _height;
   uint8_t rotation;
+  boolean isFastRefreshEnabled = false;
 
 };
 

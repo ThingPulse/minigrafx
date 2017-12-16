@@ -14,6 +14,10 @@ void EPD_WaveShare_43::init(void) {
   setMemory(MEM_NAND);
 }
 
+void EPD_WaveShare_43::setFastRefresh(boolean isFastRefreshEnabled) {
+  // Not enabled at the moment
+}
+
 void EPD_WaveShare_43::setRotation(uint8_t r) {
 
 }

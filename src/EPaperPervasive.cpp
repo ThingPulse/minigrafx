@@ -48,7 +48,7 @@ EPD_Class::EPD_Class(EPD_size size,
          int discharge_pin,
          int reset_pin,
          int busy_pin,
-         int chip_select_pin) : 
+         int chip_select_pin) :
          DisplayDriver(width, height),
   EPD_Pin_PANEL_ON(panel_on_pin),
   EPD_Pin_BORDER(border_pin),
@@ -104,6 +104,10 @@ EPD_Class::EPD_Class(EPD_size size,
   }
   }
 
+}
+
+void EPD_Class::setFastRefresh(boolean isFastRefreshEnabled) {
+  // Not implemented at the moment
 }
 
 

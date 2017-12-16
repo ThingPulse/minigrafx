@@ -127,6 +127,7 @@ public:
   void frame_data_13(const uint8_t *image_data, EPD_stage stage, bool read_progmem = true);
   void frame_cb_13(uint32_t address, EPD_reader *reader, EPD_stage stage);
   void frame_cb_13(uint8_t *buffer, EPD_stage stage);
+  void setFastRefresh(boolean isFastRefreshEnabled);
 
   // single line display - very low-level
   // also has to handle AVR progmem

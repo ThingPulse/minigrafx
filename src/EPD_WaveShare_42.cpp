@@ -80,6 +80,10 @@ void EPD_WaveShare42::init() {
 
 }
 
+void EPD_WaveShare42::setFastRefresh(boolean isFastRefreshEnabled) {
+  // Not enabled at the moment
+}
+
 void EPD_WaveShare42::DigitalWrite(int pin, int value) {
     digitalWrite(pin, value);
 }

@@ -148,7 +148,7 @@ void EPD_WaveShare::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t 
   EPD_SetRamPointer(0x00,(yDot-1)%256,(yDot-1)/256);	// set ram
   //Serial.println(">>>>>>------start send display data!!---------<<<<<<<");
   int i = 0,j = 0;
-	if(XSize%8 != 0){
+	if(XSize % 8 != 0){
 		XSize = XSize+(8-XSize%8);
 	}
 	XSize = XSize/8;
@@ -196,6 +196,10 @@ void EPD_WaveShare::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t 
 
   EPD_Update();
 
+}
+
+void EPD_WaveShare::setFastRefresh(boolean isFastRefreshEnabled) {
+  // Not enabled at the moment
 }
 
 uint8_t EPD_WaveShare::getPixel(uint8_t *buffer, uint16_t x, uint16_t y) {

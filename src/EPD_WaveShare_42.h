@@ -169,6 +169,7 @@ class EPD_WaveShare42 : public DisplayDriver {
     void DisplayFrame(void);
     void ClearFrame(void);
     void Sleep(void);
+    void setFastRefresh(boolean isFastRefreshEnabled);
 
     uint8_t reverse(uint8_t in);
 

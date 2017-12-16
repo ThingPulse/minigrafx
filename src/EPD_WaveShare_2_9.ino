@@ -29,7 +29,7 @@ Demo for the buffered graphics library. Renders a 3D cube
 */
 
 #include <SPI.h>
-#include "EPD_WaveShare.h"
+#include "EPD_WaveShare_29.h"
 #include "MiniGrafx.h"
 #include "DisplayDriver.h"
 
@@ -45,35 +45,36 @@ Demo for the buffered graphics library. Renders a 3D cube
  GND      GND
  3.3V     3V3
 */
-#define CS D3
+/*#define CS D3
 #define RST D2
 #define DC D8
-#define BUSY D1
+#define BUSY D1*/
 
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 296
+#define CS 15  // D8
+#define RST 2  // D4
+#define DC 5   // D1
+#define BUSY 4 // D2
+
 #define BITS_PER_PIXEL 1
 
 
 uint16_t palette[] = {0, 1};
+boolean isFastRefreshEnabled = false;
 
-EPD_WaveShare epd(EPD2_9, CS, RST, DC, BUSY);
+EPD_WaveShare29 epd(CS, RST, DC, BUSY);
 MiniGrafx gfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette);
-
+uint8_t counter = 0;
 void setup() {
+  Serial.begin(115200);
   gfx.init();
+  gfx.setRotation(0);
 
 }
 
-uint8_t rotation = 0;
+uint8_t rotation = 2;
 
 void loop() {
-  //epd.Dis_Clear_full();
-  //delay(1500);
-  //epd.EPD_init_Part();
-  //delay(1000);
 
-  //gfx.init();
   gfx.setRotation(rotation);
   gfx.fillBuffer(1);
   gfx.setColor(0);
@@ -83,8 +84,16 @@ void loop() {
   gfx.setFont(ArialMT_Plain_16);
   gfx.drawString(10, 30, "Everything works!");
   gfx.setFont(ArialMT_Plain_24);
-  gfx.drawString(10, 55, "Yes! Millis: " + String(millis()));
+  gfx.drawString(10, 55, "Yes! Millis: \n" + String(counter));
+  long startTime = millis();
   gfx.commit();
-  delay(5000);
+  Serial.printf("Time to update screen: %d\n",  millis() - startTime);
+  delay(1000);
   rotation = (rotation + 1) % 4;
+  if (rotation == 3) {
+    isFastRefreshEnabled = !isFastRefreshEnabled;
+    gfx.setFastRefresh(isFastRefreshEnabled);
+  }
+  counter++;
+
 }

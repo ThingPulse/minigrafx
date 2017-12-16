@@ -116,6 +116,7 @@ class EPD_WaveShare : public DisplayDriver {
     void EPD_Dis_Full(unsigned char *DisBuffer,unsigned char Label);
     void EPD_Dis_Part(unsigned char xStart,unsigned char xEnd,unsigned long yStart,unsigned long yEnd,unsigned char *DisBuffer,unsigned char Label);
     void Dis_Char(char acsii,char size,char mode,char next,unsigned char *buffer);
+    void setFastRefresh(boolean isFastRefreshEnabled);
 
     void driver_delay_xms(unsigned long xms);
     void SPI_Write(unsigned char value);

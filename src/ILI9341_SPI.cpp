@@ -125,6 +125,10 @@ void ILI9341_SPI::spiwrite(uint8_t c) {
   }
 }
 
+void ILI9341_SPI::setFastRefresh(boolean isFastRefreshEnabled) {
+  // Not enabled at the moment
+}
+
 
 void ILI9341_SPI::writecommand(uint8_t c) {
 #if defined (USE_FAST_PINIO)
