@@ -309,12 +309,12 @@ void MiniGrafx::drawStringMaxWidth(int16_t xMove, int16_t yMove, uint16_t maxLin
     strWidth += readFontData(fontData, JUMPTABLE_START + (text[i] - firstChar) * JUMPTABLE_BYTES + JUMPTABLE_WIDTH);
 
     // Always try to break on a space or dash
-    if (text[i] == ' ' || text[i]== '-') {
+    if (text[i] == ' ' || text[i]== '-' || text[i] == '\n') {
       preferredBreakpoint = i;
       widthAtBreakpoint = strWidth;
     }
 
-    if (strWidth >= maxLineWidth) {
+    if (strWidth >= maxLineWidth || text[i] == '\n') {
       if (preferredBreakpoint == 0) {
         preferredBreakpoint = i;
         widthAtBreakpoint = strWidth;

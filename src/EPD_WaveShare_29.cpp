@@ -155,11 +155,11 @@ void EPD_WaveShare29::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_
 }
 
 int EPD_WaveShare29::IfInit(void) {
-    pinMode(this->cs_pin, OUTPUT);
+    digitalWrite(this->cs_pin, OUTPUT);
     pinMode(this->reset_pin, OUTPUT);
     pinMode(this->dc_pin, OUTPUT);
     pinMode(this->busy_pin, INPUT);
-    SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+    SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
     SPI.begin();
     return 0;
 }
@@ -432,8 +432,11 @@ uint8_t EPD_WaveShare29::reverse(uint8_t in)
  *          You can use Epd::Init() to awaken
  */
 void EPD_WaveShare29::Sleep() {
+    digitalWrite(this->cs_pin, LOW);
+    digitalWrite(this->reset_pin, LOW);
+    digitalWrite(this->dc_pin, LOW);
     SendCommand(DEEP_SLEEP_MODE);
-    WaitUntilIdle();
+    //WaitUntilIdle();
 }
 
 
