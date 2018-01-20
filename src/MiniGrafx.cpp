@@ -1091,18 +1091,18 @@ void MiniGrafx::drawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2,
   drawLine(x3, y3, x1, y1);
 }
 
-//invert swaps the colors in the given rectangles (only implemented for 1-bit displays)
-void MiniGrafx::invert(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
+//swaps the colors in the given rectangle
+void MiniGrafx::colorSwap(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color1, uint16_t color2) {
    uint16_t pix;
   for (int y=y1; y<y2; y++){
     for (int x=x1; x < x2; x++){
       pix = getPixel(x, y);
-      if (pix==0){
-        setColor(1);
+      if (pix==color1){
+        setColor(color2);
         setPixel(x, y);
       }
       else{
-        setColor(0);
+        setColor(color1);
         setPixel(x, y);
       }
     }
