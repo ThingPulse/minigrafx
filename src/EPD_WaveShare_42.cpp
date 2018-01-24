@@ -49,8 +49,27 @@ int EPD_WaveShare42::getHeight() {
 }
 
 void EPD_WaveShare42::setRotation(uint8_t r) {
-  // Currently not supported
+  this->rotation = r;
+  switch(r) {
+    case 0:
+      bufferWidth = width;
+      bufferHeight = height;
+      break;
+    case 1:
+      bufferWidth = height;
+      bufferHeight = width;
+      break;
+    case 2:
+      bufferWidth = width;
+      bufferHeight = height;
+      break;
+    case 3:
+      bufferWidth = height;
+      bufferHeight = width;
+      break;
+  }
 }
+
 void EPD_WaveShare42::init() {
   /* this calls the peripheral hardware interface, see epdif */
   if (IfInit() != 0) {
@@ -219,6 +238,17 @@ void EPD_WaveShare42::SetLut(void) {
  * @brief: refresh and displays the frame
  */
 void EPD_WaveShare42::DisplayFrame(const unsigned char* frame_buffer) {
+    uint16_t x = 0;
+    uint16_t y = 0;
+    int x_end;
+    int y_end;
+    uint16_t image_width = width;
+    uint16_t image_height = height;
+    uint16_t bufferSize = width * height / 8;
+    uint16_t xDot = bufferWidth;
+    uint16_t yDot = bufferHeight;
+    uint8_t data;
+
     SendCommand(RESOLUTION_SETTING);
     SendData(width >> 8);
     SendData(width & 0xff);
@@ -232,16 +262,50 @@ void EPD_WaveShare42::DisplayFrame(const unsigned char* frame_buffer) {
     SendCommand(0x97);    //VBDF 17|D7 VBDW 97  VBDB 57  VBDF F7  VBDW 77  VBDB 37  VBDR B7
 
     if (frame_buffer != NULL) {
-        SendCommand(DATA_START_TRANSMISSION_1);
+        /*SendCommand(DATA_START_TRANSMISSION_1);
         for(int i = 0; i < width / 8 * height; i++) {
             SendData(0xFF);      // bit set: white, bit reset: black
         }
-        DelayMs(2);
-        SendCommand(DATA_START_TRANSMISSION_2);
+        DelayMs(2);*/
+        /*SendCommand(DATA_START_TRANSMISSION_2);
         for(int i = 0; i < width / 8 * height; i++) {
             SendData(reverse(frame_buffer[i]));
         }
-        DelayMs(2);
+        DelayMs(2);*/
+        SendCommand(DATA_START_TRANSMISSION_2);
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < (width) / 8; j++) {
+
+                data = 0;
+                for (int b = 0; b < 8; b++) {
+                  data = data << 1;
+                  switch (rotation) {
+                    case 0:
+                      x = (j * 8 + b);
+                      y = i;
+                      break;
+                    case 1:
+                      x = bufferWidth - i;
+                      y = (j * 8 + b);
+                      break;
+                    case 2:
+                      x = xDot - (j * 8 + b);
+                      y = yDot - i;
+                      break;
+                    case 3:
+                      x = i;
+                      y = bufferHeight - (j * 8 + b);
+                      break;
+                  }
+                  data = data | (getPixel(frame_buffer, x, y) & 1);
+
+                }
+                SendData(data);
+                //SendData(reverse(buffer[(i + j * (image_width / 8))]));
+                //SendData(i);
+                yield();
+            }
+        }
     }
 
     SetLut();
@@ -249,6 +313,24 @@ void EPD_WaveShare42::DisplayFrame(const unsigned char* frame_buffer) {
     SendCommand(DISPLAY_REFRESH);
     DelayMs(100);
     WaitUntilIdle();
+}
+
+uint8_t EPD_WaveShare42::getPixel(const unsigned char *buffer, uint16_t x, uint16_t y) {
+  uint8_t bitsPerPixel = 1;
+  uint8_t bitMask = (1 << bitsPerPixel) - 1;
+  uint8_t pixelsPerByte = 8 / bitsPerPixel;
+  uint8_t bitShift = 3;
+
+  if (x >= bufferWidth || y >= bufferHeight) return 0;
+  // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
+  // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
+  // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
+  // bitsPerPixel  1, pixPerByte: 8, 3  8 = 2^3
+  uint16_t pos = (y * bufferWidth + x) >> bitShift;
+
+  uint8_t shift = (x & (pixelsPerByte - 1)) * bitsPerPixel;
+
+  return (buffer[pos] >> shift) & bitMask;
 }
 
 uint8_t EPD_WaveShare42::reverse(uint8_t in)

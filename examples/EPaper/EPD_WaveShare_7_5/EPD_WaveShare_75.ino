@@ -29,9 +29,10 @@ Demo for the buffered graphics library. Renders a 3D cube
 */
 
 #include <SPI.h>
-#include "EPD_WaveShare_42.h"
+#include "EPD_WaveShare_75.h"
 #include "MiniGrafx.h"
 #include "DisplayDriver.h"
+#include "image.h"
 
 /*
  Connect the following pins:
@@ -55,14 +56,14 @@ Demo for the buffered graphics library. Renders a 3D cube
 #define DC 5   // D1
 #define BUSY 4 // D2
 
-#define SCREEN_WIDTH 400
-#define SCREEN_HEIGHT 300
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 384
 #define BITS_PER_PIXEL 1
 
 
 uint16_t palette[] = {0, 1};
 
-EPD_WaveShare42 epd(CS, RST, DC, BUSY);
+EPD_WaveShare75 epd(CS, RST, DC, BUSY);
 MiniGrafx gfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette);
 
 void setup() {
@@ -78,14 +79,15 @@ void loop() {
 
   gfx.setRotation(rotation);
   gfx.fillBuffer(1);
-  gfx.setColor(0);
+  /*gfx.setColor(0);
   gfx.setFont(ArialMT_Plain_10);
   gfx.drawLine(0, 0, gfx.getWidth(), gfx.getHeight());
   gfx.drawString(10, 10, "Hello World");
   gfx.setFont(ArialMT_Plain_16);
   gfx.drawString(10, 30, "Everything works!");
   gfx.setFont(ArialMT_Plain_24);
-  gfx.drawString(10, 55, "Yes! Millis: " + String(millis()));
+  gfx.drawString(10, 55, "Yes! Millis: " + String(millis()));*/
+  gfx.drawPalettedBitmapFromPgm(0, 0, miniCalendar);
   gfx.commit();
   rotation = (rotation + 1) % 4;
   delay(5000);
