@@ -956,7 +956,7 @@ void MiniGrafx::drawPalettedBitmapFromFile(uint16_t xMove, uint16_t yMove, Strin
 
   int16_t widthRoundedUp = (width + 7) & ~7;
 
-  uint8_t data;
+  uint8_t data = 0;
   uint8_t paletteIndex = 0;
   uint32_t pointer = CUSTOM_BITMAP_DATA_START;
   // bitdepth = 8, initialShift = 0

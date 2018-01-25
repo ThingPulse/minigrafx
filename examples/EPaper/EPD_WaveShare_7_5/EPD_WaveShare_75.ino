@@ -32,7 +32,6 @@ Demo for the buffered graphics library. Renders a 3D cube
 #include "EPD_WaveShare_75.h"
 #include "MiniGrafx.h"
 #include "DisplayDriver.h"
-#include "image.h"
 
 /*
  Connect the following pins:
@@ -50,11 +49,18 @@ Demo for the buffered graphics library. Renders a 3D cube
 #define RST D2
 #define DC D8
 #define BUSY D1*/
-
-#define CS 15  // D8
-#define RST 2  // D4
-#define DC 5   // D1
-#define BUSY 4 // D2
+#if defined(ESP8266)
+  #define CS 15  // D8
+  #define RST 2  // D4
+  #define DC 5   // D1
+  #define BUSY 4 // D2
+#else
+  #define CS 2
+  #define RST 15
+  #define DC 5
+  #define BUSY 4
+  #define USR_BTN 12
+#endif
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 384
@@ -70,6 +76,7 @@ void setup() {
   Serial.begin(115200);
   gfx.init();
   gfx.setRotation(1);
+  Serial.println("Finished Setup");
 }
 
 uint8_t rotation = 0;
@@ -79,16 +86,17 @@ void loop() {
 
   gfx.setRotation(rotation);
   gfx.fillBuffer(1);
-  /*gfx.setColor(0);
+  gfx.setColor(0);
   gfx.setFont(ArialMT_Plain_10);
   gfx.drawLine(0, 0, gfx.getWidth(), gfx.getHeight());
   gfx.drawString(10, 10, "Hello World");
   gfx.setFont(ArialMT_Plain_16);
   gfx.drawString(10, 30, "Everything works!");
   gfx.setFont(ArialMT_Plain_24);
-  gfx.drawString(10, 55, "Yes! Millis: " + String(millis()));*/
-  gfx.drawPalettedBitmapFromPgm(0, 0, miniCalendar);
+  gfx.drawString(10, 55, "Yes! Millis: " + String(millis()));
+
   gfx.commit();
+  Serial.println("Commited buffer");
   rotation = (rotation + 1) % 4;
   delay(5000);
 
