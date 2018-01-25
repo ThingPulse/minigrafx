@@ -54,7 +54,7 @@ Demo for the buffered graphics library. Renders a 3D cube
   #define RST 2  // D4
   #define DC 5   // D1
   #define BUSY 4 // D2
-#else
+#else if defined(ESP32)
   #define CS 2
   #define RST 15
   #define DC 5
