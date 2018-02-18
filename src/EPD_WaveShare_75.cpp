@@ -197,16 +197,16 @@ void EPD_WaveShare75::DisplayFrame(const unsigned char* frame_buffer) {
                     y = i;
                     break;
                   case 1:
-                    x = bufferWidth - i;
+                    x = bufferWidth - i - 1;
                     y = (j * 8 + c + 2 * b);
                     break;
                   case 2:
-                    x = xDot - (j * 8 + c + 2 * b);
-                    y = yDot - i;
+                    x = xDot - (j * 8 + c + 2 * b) - 1;
+                    y = yDot - i - 1;
                     break;
                   case 3:
                     x = i;
-                    y = bufferHeight - (j * 8 + c + 2 * b);
+                    y = bufferHeight - (j * 8 + c + 2 * b) - 1;
                     break;
                 }
                 //data = data | (getPixel(frame_buffer, x, y) & 1);
