@@ -16,8 +16,8 @@ are optimized for minimal memory consumption they have to accept ugly visual sid
 
 ## Getting started
 
-[Getting Started](Introduction.md)
+[Getting Started](Introduction.md) by reading the intro.
 
-## API
+## API
 
-[API Documentation](API.md)
+[API Documentation](API.md) of the library.
