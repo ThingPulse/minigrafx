@@ -29,7 +29,7 @@ Demo for the buffered graphics library. Renders a 3D cube
 */
 
 #include <SPI.h>
-#include "EPD_WaveShare_42.h"
+#include "EPD_WaveShare_75.h"
 #include "MiniGrafx.h"
 #include "DisplayDriver.h"
 
@@ -49,26 +49,34 @@ Demo for the buffered graphics library. Renders a 3D cube
 #define RST D2
 #define DC D8
 #define BUSY D1*/
+#if defined(ESP8266)
+  #define CS 15  // D8
+  #define RST 2  // D4
+  #define DC 5   // D1
+  #define BUSY 4 // D2
+#else if defined(ESP32)
+  #define CS 2
+  #define RST 15
+  #define DC 5
+  #define BUSY 4
+  #define USR_BTN 12
+#endif
 
-#define CS 15  // D8
-#define RST 2  // D4
-#define DC 5   // D1
-#define BUSY 4 // D2
-
-#define SCREEN_WIDTH 400
-#define SCREEN_HEIGHT 300
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 384
 #define BITS_PER_PIXEL 1
 
 
 uint16_t palette[] = {0, 1};
 
-EPD_WaveShare42 epd(CS, RST, DC, BUSY);
+EPD_WaveShare75 epd(CS, RST, DC, BUSY);
 MiniGrafx gfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette);
 
 void setup() {
   Serial.begin(115200);
   gfx.init();
   gfx.setRotation(1);
+  Serial.println("Finished Setup");
 }
 
 uint8_t rotation = 0;
@@ -86,7 +94,9 @@ void loop() {
   gfx.drawString(10, 30, "Everything works!");
   gfx.setFont(ArialMT_Plain_24);
   gfx.drawString(10, 55, "Yes! Millis: " + String(millis()));
+
   gfx.commit();
+  Serial.println("Commited buffer");
   rotation = (rotation + 1) % 4;
   delay(5000);
 

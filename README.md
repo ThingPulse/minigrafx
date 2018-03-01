@@ -1,4 +1,4 @@
-![](https://api.travis-ci.org/squix78/minigrafx.svg?branch=master)
+[![Build Status](https://travis-ci.org/ThingPulse/minigrafx.svg?branch=master)](https://travis-ci.org/ThingPulse/minigrafx)
 
 # The MiniGrafx Library
 
@@ -6,7 +6,7 @@ This is a graphics library for embedded devices containing a framebuffer to avoi
 
 ## Inspiration
 
-This library is heavily based on another library https://github.com/squix78/esp8266-oled-ssd1306
+This library is heavily based on [https://github.com/ThingPulse/esp8266-oled-ssd1306](https://github.com/ThingPulse/esp8266-oled-ssd1306)
 developed by Fabrice Weinberg and myself mostly for tiny OLED displays. This new library targets also color displays and e-paper displays with higher resolution
 
 ## Philosophy
@@ -16,8 +16,8 @@ are optimized for minimal memory consumption they have to accept ugly visual sid
 
 ## Getting started
 
-[Getting Started](Introduction.md)
+[Getting Started](Introduction.md) by reading the intro.
 
-## API
+## API
 
-[API Documentation](API.md)
+[API Documentation](API.md) of the library.

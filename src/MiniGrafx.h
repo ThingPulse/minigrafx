@@ -29,6 +29,9 @@ This code is based on a driver from http://waveshare.com
 */
 
 #include <FS.h>
+#if defined(ESP32)
+  #include <SPIFFS.h>
+#endif
 #include "ILI9341_SPI.h"
 #include "MiniGrafxFonts.h"
 

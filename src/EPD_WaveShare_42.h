@@ -170,6 +170,7 @@ class EPD_WaveShare42 : public DisplayDriver {
     void ClearFrame(void);
     void Sleep(void);
     void setFastRefresh(boolean isFastRefreshEnabled);
+    uint8_t getPixel(const unsigned char* buffer, uint16_t x, uint16_t y);
 
     uint8_t reverse(uint8_t in);
 
@@ -181,6 +182,8 @@ class EPD_WaveShare42 : public DisplayDriver {
     uint8_t rotation;
     uint16_t delaytime;
     uint16_t height, width;
+    uint16_t bufferWidth;
+    uint16_t bufferHeight;
 
 
 };
