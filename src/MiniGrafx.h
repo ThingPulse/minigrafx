@@ -134,7 +134,8 @@ class MiniGrafx {
   void fillBuffer(uint8_t pal);
   static char* utf8ascii(String s);
   static byte utf8ascii(byte ascii);
-
+  void colorSwap(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color1, uint16_t color2);
+  
  private:
   DisplayDriver *driver;
   File fontFile;
