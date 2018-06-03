@@ -408,10 +408,10 @@ void ILI9341_SPI::setRotation(uint8_t m) {
   if (hwSPI) spi_end();
 }
 
-void ILI9341_SPI::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) {
+void ILI9341_SPI::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t bufferWidth, uint16_t bufferHeight) {
 
     if (hwSPI) spi_begin();
-    setAddrWindow(0, 0, _width - 1, _height -1 );
+    setAddrWindow(0, 0, bufferWidth - 1, bufferHeight -1 );
 
     digitalWrite(_dc, HIGH);
     digitalWrite(_cs, LOW);
@@ -427,10 +427,10 @@ void ILI9341_SPI::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *p
     uint8_t packagesPerBytes = 8 / bitsPerPixel;
     uint16_t bytePos = 0;
     uint16_t pixelCounter = 0;
-    uint16_t bufferSize = _width * _height / packagesPerBytes;
-    uint8_t bytesPerLine = _width / packagesPerBytes;
+    uint16_t bufferSize = bufferWidth * bufferHeight / packagesPerBytes;
+    uint8_t bytesPerLine = bufferWidth / packagesPerBytes;
     uint16_t x = 0;
-    for (uint16_t y = 0; y < _height; y++) {
+    for (uint16_t y = 0; y < bufferHeight; y++) {
 
       for (uint16_t b = 0; b < bytesPerLine; b++) {
 

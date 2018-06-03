@@ -269,7 +269,7 @@ void EPD_WaveShare75::setFastRefresh(boolean isFastRefreshEnabled) {
   // Not enabled at the moment
 }
 
-void EPD_WaveShare75::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) {
+void EPD_WaveShare75::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t bufferWidth, uint16_t bufferHeight) {
   DisplayFrame(buffer);
 }
 

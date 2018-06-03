@@ -87,6 +87,7 @@ class MiniGrafx {
 
  public:
   MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette);
+  MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette, uint16_t width, uint16_t height);
   void init();
   void changeBitDepth(uint8_t bitsPerPixel, uint16_t *palette);
   uint16_t getHeight();
@@ -135,8 +136,9 @@ class MiniGrafx {
   static char* utf8ascii(String s);
   static byte utf8ascii(byte ascii);
   void colorSwap(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color1, uint16_t color2);
-  
+
  private:
+  void initializeBuffer();
   DisplayDriver *driver;
   File fontFile;
   uint16_t width, height;

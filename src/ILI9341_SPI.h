@@ -124,7 +124,7 @@ class ILI9341_SPI : public DisplayDriver {
   void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
   void setRotation(uint8_t r);
 
-  void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette);
+  void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t bufferWidth, uint16_t bufferHeight);
   void setFastRefresh(boolean isFastRefreshEnabled);
 
   void spiwrite(uint8_t);

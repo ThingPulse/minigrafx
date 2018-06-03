@@ -92,7 +92,7 @@ public:
     this->frame_data_13(image_data, EPD_normal, false);
   }
 
-  void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) {
+  void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t bufferWidth, uint16_t bufferHeight) {
 
     this->writeBuffer(buffer, 1, palette, EPD_inverse);
     this->frame_stage2();

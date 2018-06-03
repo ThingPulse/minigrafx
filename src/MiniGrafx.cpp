@@ -32,7 +32,22 @@ MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *pale
   this->driver = driver;
   this->width = driver->width();
   this->height = driver->height();
+  this->palette = palette;
   this->bitsPerPixel = bitsPerPixel;
+  initializeBuffer();
+
+}
+
+MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette, uint16_t width, uint16_t height) {
+  this->driver = driver;
+  this->width = width;
+  this->height = height;
+  this->palette = palette;
+  this->bitsPerPixel = bitsPerPixel;
+  initializeBuffer();
+}
+
+void MiniGrafx::initializeBuffer() {
   this->bitMask = (1 << bitsPerPixel) - 1;
   this->pixelsPerByte = 8 / bitsPerPixel;
   // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
@@ -62,41 +77,11 @@ MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *pale
   if(!this->buffer) {
     Serial.println("[DEBUG_MINI_GRAFX][init] Not enough memory to create display\n");
   }
-  this->palette = palette;
 }
+
 void MiniGrafx::changeBitDepth(uint8_t bitsPerPixel, uint16_t *palette) {
   free(this->buffer);
-  this->bitsPerPixel = bitsPerPixel;
-  this->bitMask = (1 << bitsPerPixel) - 1;
-  this->pixelsPerByte = 8 / bitsPerPixel;
-  // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
-  // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
-  // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
-  // bitsPerPixel  1, pixPerByte: 8, 3  8 = 2^3
-  // TODO: I was too stupid or too lazy to get the formula for this
-  switch(bitsPerPixel) {
-    case 1:
-      this->bitShift = 3;
-      break;
-    case 2:
-      this->bitShift = 2;
-      break;
-    case 4:
-      this->bitShift = 1;
-      break;
-    case 8:
-      this->bitShift = 0;
-      break;
-  }
-
-
-
-  this->bufferSize = this->width * this->height / (pixelsPerByte);
-  this->buffer = (uint8_t*) malloc(sizeof(uint8_t) * bufferSize);
-  if(!this->buffer) {
-    Serial.println("[DEBUG_MINI_GRAFX][init] Not enough memory to create display\n");
-  }
-  this->palette = palette;
+  initializeBuffer();
 }
 
 uint16_t MiniGrafx::getHeight() {
@@ -568,7 +553,7 @@ void MiniGrafx::clear() {
 }
 
 void MiniGrafx::commit() {
-  this->driver->writeBuffer(buffer, bitsPerPixel, palette);
+  this->driver->writeBuffer(buffer, bitsPerPixel, palette, this->width, this->height);
 }
 
 void MiniGrafx::setFastRefresh(boolean isFastRefreshEnabled) {

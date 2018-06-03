@@ -146,7 +146,7 @@ class EPD_WaveShare42 : public DisplayDriver {
     void setRotation(uint8_t r);
     void init();
 
-    void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette);
+    void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t bufferWidth, uint16_t bufferHeight);
 
     int  IfInit(void);
     void DigitalWrite(int pin, int value);

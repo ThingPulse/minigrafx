@@ -81,7 +81,7 @@ void EPD_WaveShare29::setFastRefresh(boolean isFastRefreshEnabled) {
 
 }
 
-void EPD_WaveShare29::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) {
+void EPD_WaveShare29::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t bufferWidth, uint16_t bufferHeight) {
   //SetFrameMemory(buffer, 0, 0, EPD_WIDTH, EPD_HEIGHT);
   uint16_t x = 0;
   uint16_t y = 0;

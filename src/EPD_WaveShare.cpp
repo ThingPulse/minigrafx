@@ -127,7 +127,7 @@ void EPD_WaveShare::SPI_Write(unsigned char value)
  SPI.transfer(value);
 }
 
-void EPD_WaveShare::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette) {
+void EPD_WaveShare::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t bufferWidth, uint16_t bufferHeight) {
   Serial.println("Writing buffer");
 
 
