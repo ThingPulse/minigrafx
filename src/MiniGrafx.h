@@ -130,6 +130,7 @@ class MiniGrafx {
   void setTextAlignment(TEXT_ALIGNMENT textAlignment);
   void inline drawInternal(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *data, uint16_t offset, uint16_t bytesInData);
   void commit();
+  void commit(uint16_t xPos, uint16_t yPos);
   void clear();
   void setFastRefresh(boolean isFastRefreshEnabled);
   void fillBuffer(uint8_t pal);

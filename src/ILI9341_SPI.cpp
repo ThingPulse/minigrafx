@@ -408,54 +408,54 @@ void ILI9341_SPI::setRotation(uint8_t m) {
   if (hwSPI) spi_end();
 }
 
-void ILI9341_SPI::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t bufferWidth, uint16_t bufferHeight) {
+void ILI9341_SPI::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t xPos, uint16_t yPos, uint16_t bufferWidth, uint16_t bufferHeight) {
 
     if (hwSPI) spi_begin();
-    setAddrWindow(0, 0, bufferWidth - 1, bufferHeight -1 );
+    setAddrWindow(xPos, yPos, xPos + bufferWidth - 1, yPos + bufferHeight -1 );
 
     digitalWrite(_dc, HIGH);
     digitalWrite(_cs, LOW);
+    if (bitsPerPixel == 16) {
+      //SPI.writeBytes(buffer, bufferWidth * bufferHeight);
+      /*for (uint16_t y = 0; y < bufferHeight; y++) {
+        for (uint16_t x = 0; x < bufferWidth; x++) {
 
-    // line buffer is in 16bit target format
-    uint8_t lineBuffer[_width * 2];
-    uint16_t pos;
-    uint8_t bufferByte;
-    uint8_t paletteEntry;
-    uint16_t color;
-    uint8_t shift;
-    uint8_t mask =  (1 << bitsPerPixel) - 1;
-    uint8_t packagesPerBytes = 8 / bitsPerPixel;
-    uint16_t bytePos = 0;
-    uint16_t pixelCounter = 0;
-    uint16_t bufferSize = bufferWidth * bufferHeight / packagesPerBytes;
-    uint8_t bytesPerLine = bufferWidth / packagesPerBytes;
-    uint16_t x = 0;
-    for (uint16_t y = 0; y < bufferHeight; y++) {
-
-      for (uint16_t b = 0; b < bytesPerLine; b++) {
-
-        for (uint8_t p = 0; p < packagesPerBytes; p++) {
-          x = b * packagesPerBytes + p;
-          bufferByte = buffer[bytePos];
-          shift = p * bitsPerPixel;
-          paletteEntry = (bufferByte >> shift) & mask;
-          color = palette[paletteEntry];
-          lineBuffer[x * 2] = color >> 8;
-          lineBuffer[x * 2 + 1] = color;
         }
-        bytePos++;
-      }
-      SPI.writeBytes(lineBuffer, _width * 2);
-    }
+      }*/
+    } else {
+      // line buffer is in 16bit target format
+      uint8_t lineBuffer[_width * 2];
+      uint16_t pos;
+      uint8_t bufferByte;
+      uint8_t paletteEntry;
+      uint16_t color;
+      uint8_t shift;
+      uint8_t mask = (1 << bitsPerPixel) - 1;
+      uint8_t packagesPerBytes = 8 / bitsPerPixel;
+      uint16_t bytePos = 0;
+      uint16_t pixelCounter = 0;
+      uint16_t bufferSize = bufferWidth * bufferHeight / packagesPerBytes;
+      uint8_t bytesPerLine = bufferWidth / packagesPerBytes;
+      uint16_t x = 0;
+      for (uint16_t y = 0; y < bufferHeight; y++) {
 
+        for (uint16_t b = 0; b < bytesPerLine; b++) {
+
+          for (uint8_t p = 0; p < packagesPerBytes; p++) {
+            x = b * packagesPerBytes + p;
+            bufferByte = buffer[bytePos];
+            shift = p * bitsPerPixel;
+            paletteEntry = (bufferByte >> shift) & mask;
+            color = palette[paletteEntry];
+            lineBuffer[x * 2] = color >> 8;
+            lineBuffer[x * 2 + 1] = color;
+          }
+          bytePos++;
+        }
+        SPI.writeBytes(lineBuffer, bufferWidth * 2);
+      }
+    }
     digitalWrite(_cs, HIGH);
 
     if (hwSPI) spi_end();
 }
-
-/*uint16_t ILI9341_SPI::getScreenWidth() {
-  return ILI9341_TFTWIDTH;
-}*/
-/*uint16_t ILI9341_SPI::getScreenHeight() {
-  return ILI9341_TFTHEIGHT;
-}*/

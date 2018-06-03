@@ -502,7 +502,7 @@ void inline MiniGrafx::drawInternal(int16_t xMove, int16_t yMove, int16_t width,
 }
 
 void MiniGrafx::setPixel(uint16_t x, uint16_t y) {
-  if (x >= width || y >= height || x < 0 || y < 0 || color < 0 || color > 15 || color == transparentColor) return;
+  if (x >= width || y >= height || x < 0 || y < 0 || color < 0 || color == transparentColor) return;
   // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
   // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
   // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
@@ -553,7 +553,11 @@ void MiniGrafx::clear() {
 }
 
 void MiniGrafx::commit() {
-  this->driver->writeBuffer(buffer, bitsPerPixel, palette, this->width, this->height);
+  this->driver->writeBuffer(buffer, bitsPerPixel, palette, 0, 0, this->width, this->height);
+}
+
+void MiniGrafx::commit(uint16_t xPos, uint16_t yPos) {
+  this->driver->writeBuffer(buffer, bitsPerPixel, palette, xPos, yPos, this->width, this->height);
 }
 
 void MiniGrafx::setFastRefresh(boolean isFastRefreshEnabled) {
