@@ -151,7 +151,7 @@ class MiniGrafx {
   uint16_t bufferSize = 0;
   uint16_t* palette = 0;
   uint8_t *buffer = 0;
-  uint8_t bitMask;
+  uint16_t bitMask;
   uint8_t pixelsPerByte;
   boolean isPgmFont = true;
   const char *fontData = ArialMT_Plain_16;

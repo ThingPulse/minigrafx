@@ -22,7 +22,7 @@ void EPD_WaveShare_43::setRotation(uint8_t r) {
 
 }
 
-void EPD_WaveShare_43::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t bufferWidth, uint16_t bufferHeight) {
+void EPD_WaveShare_43::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t x, uint16_t y, uint16_t bufferWidth, uint16_t bufferHeight) {
   uint8_t color = 0;
   Serial.println("Clearing");
   clear();

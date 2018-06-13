@@ -68,6 +68,13 @@ void MiniGrafx::initializeBuffer() {
     case 8:
       this->bitShift = 0;
       break;
+    case 16:
+      this->bitShift = 0;
+      this->bitMask = 0xFFFF;
+      this->bufferSize = this->width * this->height * 2;
+      this->buffer = (uint8_t*) malloc(sizeof(uint8_t) * bufferSize);
+      return;
+      break;
   }
 
 
@@ -503,6 +510,12 @@ void inline MiniGrafx::drawInternal(int16_t xMove, int16_t yMove, int16_t width,
 
 void MiniGrafx::setPixel(uint16_t x, uint16_t y) {
   if (x >= width || y >= height || x < 0 || y < 0 || color < 0 || color == transparentColor) return;
+  if (bitsPerPixel == 16) {
+    uint32_t pos = (x + y * width) << 1;
+    buffer[pos + 1] = color & 0xFF;
+    buffer[pos] = color >> 8;
+    return;
+  }
   // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
   // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
   // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
@@ -725,42 +738,44 @@ void MiniGrafx::drawBmpFromPgm(const char *bmp, uint8_t x, uint16_t y) {
   uint16_t bmpDepth;              // Bit depth (currently must be 24)
   uint32_t bmpImageoffset;        // Start of image data in file
   uint32_t rowSize;               // Not always = bmpWidth; may have padding
-  uint8_t  sdbuffer[3*20]; // pixel buffer (R+G+B per pixel)
+  uint8_t  sdbuffer[3*80]; // pixel buffer (R+G+B per pixel)
   uint8_t  buffidx = sizeof(sdbuffer); // Current position in sdbuffer
   boolean  goodBmp = false;       // Set to true on valid header parse
-  boolean  flip    = true;        // BMP is stored bottom-to-top
+  boolean  flip    = false;        // BMP is stored bottom-to-top
   uint32_t      w, h, row, col;
   uint8_t  r, g, b;
+
   uint32_t pos = 0, startTime = millis();
-  uint16_t paletteRGB[1 << bitsPerPixel][3];
-  for (int i = 0; i < 1 << bitsPerPixel; i++) {
+  uint16_t numberOfColors = bitsPerPixel == 16 ? 0 : 1 << bitsPerPixel;
+  uint16_t paletteRGB[numberOfColors][3];
+
+  for (int i = 0; i < numberOfColors; i++) {
     paletteRGB[i][0] = 255 * (palette[i] & 0xF800 >> 11) / 31;
     paletteRGB[i][1] = 255 * (palette[i] & 0x7E0 >> 5) / 63;
     paletteRGB[i][2] = 255 * (palette[i] & 0x1F) / 31;
   }
 
-  if((x >= width) || (y >= height)) return;
+  //if((x >= width) || (y >= height)) return;
 
-  /*Serial.println();
-  Serial.print(F("Loading image '"));
-  Serial.print(filename);
-  Serial.println('\'');*/
 
 
   // Parse BMP header
   uint32_t dataPointer = 0;
+
+
   uint16_t signature = pgm_read_word(bmp);
   dataPointer += 2;
   if(signature == 0x4D42) { // BMP signature
     //Serial.print(F("File size: "));
     uint32_t filesize = pgm_read_dword(bmp + dataPointer);
+
     dataPointer += 4;
-    //Serial.println(filesize);
+    // Serial.println(filesize);
     //(void)read32(bmpFile); // Read & ignore creator bytes
     dataPointer += 4;
     bmpImageoffset = pgm_read_dword(bmp + dataPointer); // Start of image data
     dataPointer += 4;
-    //Serial.print(F("Image Offset: ")); Serial.println(bmpImageoffset, DEC);
+    // Serial.print(F("Image Offset: ")); Serial.println(bmpImageoffset, DEC);
     // Read DIB header
     //Serial.print(F("Header size: "));
     uint32_t headerSize = pgm_read_dword(bmp + dataPointer);
@@ -772,8 +787,6 @@ void MiniGrafx::drawBmpFromPgm(const char *bmp, uint8_t x, uint16_t y) {
     uint16_t planes = pgm_read_word(bmp + dataPointer);
     dataPointer += 2;
 
-
-    return;
     if(planes == 1) { // # planes -- must be '1'
       bmpDepth = pgm_read_word(bmp + dataPointer); // bits per pixel
       dataPointer += 2;
@@ -804,13 +817,13 @@ void MiniGrafx::drawBmpFromPgm(const char *bmp, uint8_t x, uint16_t y) {
         // Crop area to be loaded
         w = bmpWidth;
         h = bmpHeight;
-        if((x+w-1) >= width)  w = width  - x;
-        if((y+h-1) >= height) h = height - y;
+        //if((x+w-1) >= width)  w = width  - x;
+        //if((y+h-1) >= height) h = height - y;
 
         // Set TFT address window to clipped image bounds
         //_tft->setAddrWindow(x, y, x+w-1, y+h-1);
 
-        for (row = 0; row<5; row++) { // For each scanline...
+        for (row = 0; row<h; row++) { // For each scanline...
 
           // Seek to start of scan line.  It might seem labor-
           // intensive to be doing this on every line, but this
@@ -819,16 +832,17 @@ void MiniGrafx::drawBmpFromPgm(const char *bmp, uint8_t x, uint16_t y) {
           // place if the file position actually needs to change
           // (avoids a lot of cluster math in SD library).
 
-          if(flip) // Bitmap is stored bottom-to-top order (normal BMP)
+          /*if(flip) // Bitmap is stored bottom-to-top order (normal BMP)
             pos = bmpImageoffset + (bmpHeight - 1 - row) * rowSize;
           else     // Bitmap is stored top-to-bottom
-            pos = bmpImageoffset + row * rowSize;
+            pos = bmpImageoffset + row * rowSize;*/
           /*if(bmpFile.position() != pos) { // Need seek?
             bmpFile.seek(pos, SeekSet);
             buffidx = sizeof(sdbuffer); // Force buffer reload
           }*/
 
           for (col=0; col<w; col++) { // For each pixel...
+
             // Time to read more pixel data?
             if (buffidx >= sizeof(sdbuffer)) { // Indeed
               //bmpFile.read(sdbuffer, sizeof(sdbuffer));
@@ -841,20 +855,28 @@ void MiniGrafx::drawBmpFromPgm(const char *bmp, uint8_t x, uint16_t y) {
             b = sdbuffer[buffidx++];
             g = sdbuffer[buffidx++];
             r = sdbuffer[buffidx++];
-            uint16_t color = (b + g + r) / (3 * 16);
-            setColor(color);
-            uint32_t minDistance = 99999999L;
-            for (int i = 0; i < (1 << bitsPerPixel); i++) {
-              int16_t rd = (r-paletteRGB[i][0]) * 30;
-              int16_t gd = (g-paletteRGB[i][1]) * 59;
-              int16_t bd = (b-paletteRGB[i][2]) * 11;
-              uint32_t distance = rd * rd + gd * gd + bd * bd;
-              if (distance < minDistance) {
-                setColor(i);
-                minDistance = distance;
+
+            if (bitsPerPixel == 16) {
+              uint16_t color = ((g & 0xF8) << 8) | ((b & 0xFC) << 3) | (r >> 3);
+              setColor(color);
+            } else {
+              uint16_t color = (b + g + r) / (3 * 16);
+              setColor(color);
+              uint32_t minDistance = 99999999L;
+              for (int i = 0; i < (1 << bitsPerPixel); i++) {
+                int16_t rd = (r-paletteRGB[i][0]) * 30;
+                int16_t gd = (g-paletteRGB[i][1]) * 59;
+                int16_t bd = (b-paletteRGB[i][2]) * 11;
+                uint32_t distance = rd * rd + gd * gd + bd * bd;
+                if (distance < minDistance) {
+                  setColor(i);
+                  minDistance = distance;
+                }
               }
             }
-            setPixel(row + x, col + y);
+            //Serial.printf("%d,%d\n", row + x, col + y);
+            setPixel(x + col, y + row);
+            //setPixel(row + x, col + y);
             //_tft->pushColor(_tft->color565(r,g,b));
             yield();
           } // end pixel

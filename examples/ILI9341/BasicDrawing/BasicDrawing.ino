@@ -31,60 +31,66 @@ Demo for the buffered graphics library. Renders a 3D cube
 #include <SPI.h>
 #include "MiniGrafx.h" // General graphic library
 #include "ILI9341_SPI.h" // Hardware-specific library
+#include "image.h"
 
 #define TFT_DC D2
 #define TFT_CS D1
 #define TFT_LED D8
 
 // defines the colors usable in the paletted 16 color frame buffer
-uint16_t palette[] = {ILI9341_BLACK, // 0
-                      ILI9341_WHITE, // 1
-                      ILI9341_NAVY, // 2
-                      ILI9341_DARKCYAN, // 3
-                      ILI9341_DARKGREEN, // 4
-                      ILI9341_MAROON, // 5
-                      ILI9341_PURPLE, // 6
-                      ILI9341_OLIVE, // 7
-                      ILI9341_LIGHTGREY, // 8
-                      0x39E7, //ILI9341_DARKGREY, // 9
-                      ILI9341_BLUE, // 10
-                      ILI9341_GREEN, // 11
-                      ILI9341_CYAN, // 12
-                      ILI9341_RED, // 13
-                      ILI9341_MAGENTA, // 14
-                      0xFD80}; // 15
+uint16_t palette[256];
 
 
 
 int SCREEN_WIDTH = 240;
 int SCREEN_HEIGHT = 320;
-int BITS_PER_PIXEL = 4 ; // 2^4 = 16 colors
+int BITS_PER_PIXEL = 16;
 
 // Initialize the driver
 ILI9341_SPI tft = ILI9341_SPI(TFT_CS, TFT_DC);
-MiniGrafx gfx = MiniGrafx(&tft, BITS_PER_PIXEL, palette);
+MiniGrafx gfx = MiniGrafx(&tft, BITS_PER_PIXEL, palette, 240, 40);
 
+uint64_t lastRefresh = 0;
+uint16_t counter = 0;
 void setup() {
   Serial.begin(115200);
 
   // Turn on the background LED
   pinMode(TFT_LED, OUTPUT);
   digitalWrite(TFT_LED, HIGH);
-
+  for (uint16_t i = 0; i < 255; i++) {
+    palette[i] = ((i / 8) << 11) | ((i / 4) << 5) | (i / 8);
+  }
   // Initialize the driver only once
   gfx.init();
   // fill the buffer with black
   gfx.fillBuffer(0);
   // write the buffer to the display
-  gfx.commit();
+  //gfx.commit();
+
+  gfx.drawBmpFromPgm(image, 0, 0);
+  gfx.setColor(ILI9341_WHITE);
+  gfx.drawString(0, 0, String(1000.0 / (millis() - lastRefresh), 1) + "fps");
+  lastRefresh = millis();
+  gfx.commit(0, 0);
+  gfx.fillBuffer(0);
+  gfx.drawBmpFromPgm(image, 0, -40);
+  gfx.commit(0, 40);
 }
 
-
+//uint8_t counter = 0;
 void loop() {
   gfx.fillBuffer(0);
   gfx.setColor(1);
-  gfx.drawLine(0, 0, 20, 20);
-  gfx.setColor(13);
-  gfx.fillCircle(20, 20, 5);
-  gfx.commit();
+  gfx.setFont(ArialMT_Plain_16);
+  gfx.setColor(ILI9341_WHITE);
+  gfx.drawString(0, 0, String(1000.0 / (millis() - lastRefresh), 1) + "fps");
+  lastRefresh = millis();
+  gfx.commit(0, 80);
+
+
+
+
+  counter++;
+
 }

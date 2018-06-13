@@ -416,7 +416,7 @@ void ILI9341_SPI::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *p
     digitalWrite(_dc, HIGH);
     digitalWrite(_cs, LOW);
     if (bitsPerPixel == 16) {
-      //SPI.writeBytes(buffer, bufferWidth * bufferHeight);
+      SPI.writeBytes(buffer, bufferWidth * bufferHeight * 2);
       /*for (uint16_t y = 0; y < bufferHeight; y++) {
         for (uint16_t x = 0; x < bufferWidth; x++) {
 

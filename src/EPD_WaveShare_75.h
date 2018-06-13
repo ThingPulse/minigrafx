@@ -84,7 +84,7 @@ public:
     ~EPD_WaveShare75();
     void  init(void);
     void setRotation(uint8_t r);
-    void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t bufferWidth, uint16_t bufferHeight);
+    void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t x, uint16_t y, uint16_t bufferWidth, uint16_t bufferHeight);
 
 
     void WaitUntilIdle(void);
