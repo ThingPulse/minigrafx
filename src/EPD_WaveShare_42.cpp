@@ -122,12 +122,20 @@ void EPD_WaveShare42::SpiTransfer(unsigned char data) {
 }
 
 int EPD_WaveShare42::IfInit(void) {
+    Serial.println("Setting pin modes");
+    digitalWrite(this->csPin, HIGH);
     pinMode(this->csPin, OUTPUT);
+    digitalWrite(this->rstPin, HIGH);
     pinMode(this->rstPin, OUTPUT);
+    digitalWrite(this->dcPin, HIGH);
     pinMode(this->dcPin, OUTPUT);
-    pinMode(this->busyPin, INPUT);
-    SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+    digitalWrite(this->busyPin, HIGH);
+    pinMode(this->busyPin, OUTPUT);
+    Serial.println("Starting SPI transaction");
     SPI.begin();
+    SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
+    Serial.println("Beginning SPI");
+
     return 0;
 }
 

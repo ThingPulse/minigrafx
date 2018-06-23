@@ -408,6 +408,23 @@ void ILI9341_SPI::setRotation(uint8_t m) {
   if (hwSPI) spi_end();
 }
 
+void ILI9341_SPI::pushColor(uint16_t color) {
+  if (hwSPI) spi_begin();
+
+  digitalWrite(_dc, HIGH);
+  digitalWrite(_cs, LOW);
+
+
+  spiwrite(color >> 8);
+  spiwrite(color);
+
+
+  digitalWrite(_cs, HIGH);
+
+  if (hwSPI) spi_end();
+
+}
+
 void ILI9341_SPI::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t xPos, uint16_t yPos, uint16_t bufferWidth, uint16_t bufferHeight) {
 
     if (hwSPI) spi_begin();
