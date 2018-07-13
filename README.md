@@ -1,8 +1,13 @@
 [![Build Status](https://travis-ci.org/ThingPulse/minigrafx.svg?branch=master)](https://travis-ci.org/ThingPulse/minigrafx)
 
-# The MiniGrafx Library
+# ThingPulse MiniGrafx Library
 
 This is a graphics library for embedded devices containing a framebuffer to avoid flickering. Instead of writing directly to the display all drawing operations are made on the buffer stored in memory. Once you are finished with one drawing cycle the whole content of the framebuffer is written to the display.
+
+## Service level promise
+
+<table><tr><td><img src="https://thingpulse.com/assets/ThingPulse-open-source-prime.png" width="150">
+</td><td>This is a ThingPulse <em>prime</em> project. See our <a href="https://thingpulse.com/about/open-source-commitment/">open-source commitment declaration</a> for what this means.</td></tr></table>
 
 ## Inspiration
 
