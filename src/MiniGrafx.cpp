@@ -556,7 +556,7 @@ uint16_t MiniGrafx::getPixel(uint16_t x, uint16_t y) {
 void MiniGrafx::fillBuffer(uint8_t pal) {
     uint8_t byteCol = pal;
     for (int i = 0; i < pixelsPerByte; i++) {
-      byteCol = byteCol | (pal << i);
+      byteCol |= (pal << (bitsPerPixel * i));
     }
     memset(buffer, byteCol, bufferSize);
 }

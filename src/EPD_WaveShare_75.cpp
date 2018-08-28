@@ -151,77 +151,60 @@ void EPD_WaveShare75::Reset(void) {
     DelayMs(200);
 }
 
-void EPD_WaveShare75::DisplayFrame(const unsigned char* frame_buffer) {
+/**
+ * Transmits the frame_buffer to the display.
+ * If bitsPerPixel is greater than 1, the color palette is used to transform
+ * the colors in the frame buffer to real color values of the display.
+ * If bitsPerPixel is 1, then the value 1 in the frame buffer is interpreted
+ * as white, other values are treated as black.
+ * @param frame_buffer Contents to be displayed.
+ * @param bitsPerPixel Number of Bits used to represent a pixel.
+ * @param palette Color palette used, if bitsPerPixel is greater then 1.
+ */
+void EPD_WaveShare75::DisplayFrame(const unsigned char* frame_buffer, uint8_t bitsPerPixel, uint16_t* palette) {
     uint16_t x = 0;
     uint16_t y = 0;
-    int x_end;
-    int y_end;
-    uint16_t image_width = width;
-    uint16_t image_height = height;
-    uint16_t bufferSize = width * height / 8;
-    uint16_t xDot = bufferWidth;
-    uint16_t yDot = bufferHeight;
+    uint8_t pixelsPerByte = 8 / bitsPerPixel;
     uint8_t data;
-    unsigned char temp1, temp2;
     SendCommand(DATA_START_TRANSMISSION_1);
-    /**for(long i = 0; i < EPD_WIDTH / 8 * EPD_HEIGHT; i++) {
-        temp1 = frame_buffer[i];
-        for(unsigned char j = 0; j < 8; j++) {
-            if(temp1 & 0x1)
-                temp2 = 0x03;
-            else
-                temp2 = 0x00;
 
-            temp2 <<= 4;
-            temp1 >>= 1;
-            j++;
-            if(temp1 & 0x1)
-                temp2 |= 0x03;
-            else
-                temp2 |= 0x00;
-            temp1 >>= 1;
-            SendData(temp2);
-        }
-    }*/
     for (int i = 0; i < height; i++) {
-        for (int j = 0; j < (width) / 8; j++) {
-
-            data = 0;
-            for (int b = 0; b < 4; b++) {
-              data = 0;
-              for (int c = 0; c < 2; c++) {
-                data = data << 4;
-                switch (rotation) {
-                  case 0:
-                    x = (j * 8 + c + 2 * b);
-                    y = i;
-                    break;
-                  case 1:
-                    x = bufferWidth - i - 1;
-                    y = (j * 8 + c + 2 * b);
-                    break;
-                  case 2:
-                    x = xDot - (j * 8 + c + 2 * b) - 1;
-                    y = yDot - i - 1;
-                    break;
-                  case 3:
-                    x = i;
-                    y = bufferHeight - (j * 8 + c + 2 * b) - 1;
-                    break;
+        for (int j = 0; j < width / pixelsPerByte; j++) {
+            for (int b = 0; b < pixelsPerByte / 2; b++) {
+                data = 0;
+                for (int c = 0; c < 2; c++) {
+                    data <<= 4;
+                    switch (rotation) {
+                        case 0:
+                            x = j * pixelsPerByte + b * 2 + c;
+                            y = i;
+                            break;
+                        case 1:
+                            x = bufferWidth - i - 1;
+                            y = j * pixelsPerByte + b * 2 + c;
+                            break;
+                        case 2:
+                            x = bufferWidth - (j * pixelsPerByte + b * 2 + c) - 1;
+                            y = bufferHeight - i - 1;
+                            break;
+                        case 3:
+                            x = i;
+                            y = bufferHeight - (j * pixelsPerByte + b * 2 + c) - 1;
+                            break;
+                    }
+                    uint8_t byteValue = getPixel(frame_buffer, x, y, bitsPerPixel);
+                    // Compatibility: Black/White mode without color palette.
+                    if (pixelsPerByte == 1) {
+                        data |= (byteValue == 1 ?  0x03 : 0x00);
+                    }
+                    else {
+                        if (byteValue >= 0 && byteValue <= 2) {
+                            data |= (uint8_t) palette[ byteValue ];
+                        }
+                    }
                 }
-                //data = data | (getPixel(frame_buffer, x, y) & 1);
-                if (getPixel(frame_buffer, x, y) == 1) {
-                  data |= 0x03;
-                } else {
-                  data |= 0x00;
-                }
-
-              }
-              SendData(data);
+                SendData(data);
             }
-
-            //SendData(reverse(buffer[(i + j * (image_width / 8))]));
-            //SendData(i);
             yield();
         }
     }
@@ -230,21 +213,39 @@ void EPD_WaveShare75::DisplayFrame(const unsigned char* frame_buffer) {
     WaitUntilIdle();
 }
 
-uint8_t EPD_WaveShare75::getPixel(const unsigned char *buffer, uint16_t x, uint16_t y) {
-  uint8_t bitsPerPixel = 1;
+/**
+ * Gets the pixel value at the given coordinate.
+ * This method is used for compatibility with the older implementations
+ * which don't support colors. It can only be used if the number of
+ * bits per pixel is 1.
+ * @param buffer Frame buffer.
+ * @param x X position of the pixel.
+ * @param x Y position of the pixel.
+ * @return The color value of the pixel.
+ */
+uint8_t EPD_WaveShare75::getPixel(const unsigned char* buffer, uint16_t x, uint16_t y) {
+    return getPixel(buffer, x, y, 1);
+}
+
+/**
+ * Gets the pixel value at the given coordinate.
+ * @param buffer Frame buffer.
+ * @param x X position of the pixel.
+ * @param x Y position of the pixel.
+ * @param bitsPerPixel Number of bits used to represent a pixel.
+ * @return If bitsPerPixel is 1 the color value of the pixel or if bitsPerPixel is
+ *      greater than 1 the index in the color palette.
+ */
+uint8_t EPD_WaveShare75::getPixel(const unsigned char* buffer, uint16_t x, uint16_t y, uint8_t bitsPerPixel) {
   uint8_t bitMask = (1 << bitsPerPixel) - 1;
   uint8_t pixelsPerByte = 8 / bitsPerPixel;
-  uint8_t bitShift = 3;
 
-  if (x >= bufferWidth || y >= bufferHeight) return 0;
-  // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
-  // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
-  // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
-  // bitsPerPixel  1, pixPerByte: 8, 3  8 = 2^3
-  uint16_t pos = (y * bufferWidth + x) >> bitShift;
+  if (x >= bufferWidth || y >= bufferHeight) {
+    return 0;
+  }
 
+  uint32_t pos = (y * bufferWidth + x) / pixelsPerByte;
   uint8_t shift = (x & (pixelsPerByte - 1)) * bitsPerPixel;
-
   return (buffer[pos] >> shift) & bitMask;
 }
 
@@ -270,7 +271,7 @@ void EPD_WaveShare75::setFastRefresh(boolean isFastRefreshEnabled) {
 }
 
 void EPD_WaveShare75::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t x, uint16_t y, uint16_t bufferWidth, uint16_t bufferHeight) {
-  DisplayFrame(buffer);
+  DisplayFrame(buffer, bitsPerPixel, palette);
 }
 
 /**

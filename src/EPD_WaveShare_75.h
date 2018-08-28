@@ -90,7 +90,7 @@ public:
     void WaitUntilIdle(void);
     void Reset(void);
     void SetLut(void);
-    void DisplayFrame(const unsigned char* frame_buffer);
+    void DisplayFrame(const unsigned char* frame_buffer, uint8_t bitsPerPixel, uint16_t *palette);
     void SendCommand(unsigned char command);
     void SendData(unsigned char data);
     void Sleep(void);
@@ -100,6 +100,7 @@ public:
     int  DigitalRead(int pin);
     void SpiTransfer(unsigned char data);
     void setFastRefresh(boolean isFastRefreshEnabled);
+    uint8_t getPixel(const unsigned char* buffer, uint16_t x, uint16_t y, uint8_t bitsPerPixel);
     uint8_t getPixel(const unsigned char* buffer, uint16_t x, uint16_t y);
     uint8_t reverse(uint8_t in);
 
