@@ -33,6 +33,9 @@ Demo for the buffered graphics library. Renders a 3D cube
 #include "MiniGrafx.h"
 #include "DisplayDriver.h"
 
+#define MINI_BLACK 0
+#define MINI_WHITE 1
+
 /*
  Connect the following pins:
  Display  NodeMCU
@@ -62,38 +65,55 @@ uint16_t palette[] = {0, 1};
 boolean isFastRefreshEnabled = false;
 
 EPD_WaveShare29 epd(CS, RST, DC, BUSY);
-MiniGrafx gfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette);
+MiniGrafx screenGfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette, EPD_WIDTH, EPD_HEIGHT);
+MiniGrafx dialogGfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette, 96, 96);
+
 uint8_t counter = 0;
+uint8_t rotation = 0;
+
 void setup() {
   Serial.begin(115200);
-  gfx.init();
-  gfx.setRotation(0);
+  dialogGfx.init();
+  screenGfx.init();
+  screenGfx.setRotation(rotation);
+  screenGfx.fillBuffer(MINI_WHITE);
+  screenGfx.setColor(MINI_BLACK);
+  screenGfx.setFont(ArialMT_Plain_10);
+  screenGfx.drawLine(0, 0, screenGfx.getWidth(), screenGfx.getHeight());
+  screenGfx.drawRect(0, 0, screenGfx.getWidth() - 1, screenGfx.getHeight() - 1);
+  screenGfx.drawString(0, 0, "Hello World.\nMillis: " + String(millis()) + "\nRotation: " + String(rotation));
+  screenGfx.commit();
+
 
 }
 
-uint8_t rotation = 2;
+
 
 void loop() {
 
-  gfx.setRotation(rotation);
-  gfx.fillBuffer(1);
-  gfx.setColor(0);
-  gfx.setFont(ArialMT_Plain_10);
-  gfx.drawLine(0, 0, gfx.getWidth(), gfx.getHeight());
-  gfx.drawString(10, 10, "Hello World");
-  gfx.setFont(ArialMT_Plain_16);
+
+  dialogGfx.setFastRefresh(true);
+  dialogGfx.setRotation(rotation);
+  dialogGfx.fillBuffer(MINI_BLACK);
+  dialogGfx.setColor(MINI_WHITE);
+  dialogGfx.setFont(ArialMT_Plain_10);
+  dialogGfx.drawLine(0, 0, dialogGfx.getWidth(), dialogGfx.getHeight());
+  dialogGfx.drawString(0, 0, "Hello World. Rotation:\n" + String(rotation));
+  dialogGfx.commit(16, 16);
+  /*gfx.setFont(ArialMT_Plain_16);
   gfx.drawString(10, 30, "Everything works!");
   gfx.setFont(ArialMT_Plain_24);
   gfx.drawString(10, 55, "Yes! Millis: \n" + String(counter));
   long startTime = millis();
-  gfx.commit();
-  Serial.printf("Time to update screen: %d\n",  millis() - startTime);
-  delay(1000);
+  dialogGfx.commit(0, 0);
+  Serial.printf("Time to update screen: %d, Width %d, Height: %d\n",  millis() - startTime,  dialogGfx.getWidth(), dialogGfx.getHeight());
+  delay(1000);*/
   rotation = (rotation + 1) % 4;
-  if (rotation == 3) {
+  /*if (rotation == 3) {
     isFastRefreshEnabled = !isFastRefreshEnabled;
     gfx.setFastRefresh(isFastRefreshEnabled);
-  }
+  }*/
   counter++;
+  //delay(4000);
 
 }

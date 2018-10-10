@@ -143,6 +143,7 @@ class MiniGrafx {
   DisplayDriver *driver;
   File fontFile;
   uint16_t width, height;
+  uint16_t initialWidth, initialHeight;
   uint16_t color;
   uint8_t rotation;
   int16_t transparentColor = -1;

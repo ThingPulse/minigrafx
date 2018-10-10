@@ -31,7 +31,9 @@ See more at https://blog.squix.org
 MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette) {
   this->driver = driver;
   this->width = driver->width();
+  this->initialWidth = driver->width();
   this->height = driver->height();
+  this->initialHeight = driver->height();
   this->palette = palette;
   this->bitsPerPixel = bitsPerPixel;
   initializeBuffer();
@@ -41,7 +43,9 @@ MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *pale
 MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette, uint16_t width, uint16_t height) {
   this->driver = driver;
   this->width = width;
+  this->initialWidth = width;
   this->height = height;
+  this->initialHeight = height;
   this->palette = palette;
   this->bitsPerPixel = bitsPerPixel;
   initializeBuffer();
@@ -92,32 +96,24 @@ void MiniGrafx::changeBitDepth(uint8_t bitsPerPixel, uint16_t *palette) {
 }
 
 uint16_t MiniGrafx::getHeight() {
-  return height;
+  return this->height;
 }
 uint16_t MiniGrafx::getWidth() {
-  return width;
+  return this->width;
 }
 
 void MiniGrafx::setRotation(uint8_t m) {
   rotation = m % 4; // can't be higher than 3
   switch (rotation) {
    case 0:
-     this->width  = driver->width();
-     this->height = driver->height();
+   case 2:
+     this->width  = this->initialWidth;
+     this->height = this->initialHeight;
      break;
    case 1:
-
-     this->width  = driver->height();
-     this->height = driver->width();
-     break;
-  case 2:
-
-     this->width  = driver->width();
-     this->height = driver->height();
-    break;
    case 3:
-     this->width  = driver->height();
-     this->height = driver->width();
+     this->width  = this->initialHeight;
+     this->height = this->initialWidth;
      break;
   }
   this->driver->setRotation(m);

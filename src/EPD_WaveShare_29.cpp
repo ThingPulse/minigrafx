@@ -46,24 +46,7 @@ EPD_WaveShare29::EPD_WaveShare29(uint8_t csPin, uint8_t rstPin, uint8_t dcPin, u
 
 void EPD_WaveShare29::setRotation(uint8_t r) {
   this->rotation = r;
-  switch(r) {
-    case 0:
-      bufferWidth = width;
-      bufferHeight = height;
-      break;
-    case 1:
-      bufferWidth = height;
-      bufferHeight = width;
-      break;
-    case 2:
-      bufferWidth = width;
-      bufferHeight = height;
-      break;
-    case 3:
-      bufferWidth = height;
-      bufferHeight = width;
-      break;
-  }
+
 }
 void EPD_WaveShare29::init() {
   Init(lut_full_update);
@@ -81,46 +64,48 @@ void EPD_WaveShare29::setFastRefresh(boolean isFastRefreshEnabled) {
 
 }
 
-void EPD_WaveShare29::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t xPos, uint16_t yPos, uint16_t bufferWidth, uint16_t bufferHeight) {
+void EPD_WaveShare29::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t xPosOrig, uint16_t yPosOrig, uint16_t bufferWidth, uint16_t bufferHeight) {
   //SetFrameMemory(buffer, 0, 0, EPD_WIDTH, EPD_HEIGHT);
+  uint16_t xPos = (xPosOrig / 8) * 8;
+  uint16_t yPos = yPosOrig;
   uint16_t x = 0;
   uint16_t y = 0;
-  int x_end;
-  int y_end;
-  uint16_t image_width = width;
-  uint16_t image_height = height;
-  uint16_t bufferSize = width * height / 8;
-  uint16_t xDot = bufferWidth;
-  uint16_t yDot = bufferHeight;
+  uint16_t targetWidth = width;
+  uint16_t targetHeight = height;
+  uint16_t sourceWidth = bufferWidth;
+  uint16_t sourceHeight = bufferHeight;
+  switch(rotation) {
+    case 0:
+      targetWidth = bufferWidth;
+      targetHeight = bufferHeight;
+      break;
+    case 1:
+      targetWidth = bufferHeight;
+      targetHeight = bufferWidth;
+      break;
+    case 2:
+      targetWidth = bufferWidth;
+      targetHeight = bufferHeight;
+      break;
+    case 3:
+      targetWidth = bufferHeight;
+      targetHeight = bufferWidth;
+      break;
+  }
+
+  Serial.printf("Rotation: %d, XPos: %d, YPos: %d, Source width: %d, height: %d, target width: %d, height: %d\n", rotation, xPos, yPos, sourceWidth, sourceHeight, targetWidth, targetHeight);
+
   uint8_t data;
-  if (
-      buffer == NULL ||
-      x < 0 || image_width < 0 ||
-      y < 0 || image_height < 0
-  ) {
-      return;
-  }
-  /* x point must be the multiple of 8 or the last 3 bits will be ignored */
-  x &= 0xF8;
-  image_width &= 0xF8;
-  if (image_width >= this->bufferWidth) {
-      x_end = this->bufferWidth - 1;
-  } else {
-      x_end = image_width - 1;
-  }
-  if (image_height >= this->bufferHeight) {
-      y_end = this->bufferHeight - 1;
-  } else {
-      y_end = image_height - 1;
-  }
-  SetMemoryArea(0, 0, EPD_WIDTH - 1, EPD_HEIGHT - 1);
-  SetMemoryPointer(0, 0);
+
+  SetMemoryArea(xPos, yPos, xPos + targetWidth - 1, yPos + targetHeight - 1);
+  SetMemoryPointer(xPos, yPos);
   SendCommand(WRITE_RAM);
   /* send the image data */
-  for (int i = 0; i < EPD_HEIGHT; i++) {
-      for (int j = 0; j < (EPD_WIDTH) / 8; j++) {
+  for (int i = 0; i < targetHeight; i++) {
+      for (int j = 0; j < (targetWidth) / 8; j++) {
 
           data = 0;
+          // fill the whole byte
           for (int b = 0; b < 8; b++) {
             data = data << 1;
             switch (rotation) {
@@ -129,29 +114,48 @@ void EPD_WaveShare29::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_
                 y = i;
                 break;
               case 1:
-                x = bufferWidth - i;
+                x = sourceWidth - i;
                 y = (j * 8 + b);
                 break;
               case 2:
-                x = xDot - (j * 8 + b);
-                y = yDot - i;
+                x = sourceWidth - (j * 8 + b);
+                y = sourceHeight - i;
                 break;
               case 3:
                 x = i;
-                y = bufferHeight - (j * 8 + b);
+                y = sourceHeight - (j * 8 + b);
                 break;
             }
-            data = data | (getPixel(buffer, x, y) & 1);
+            //
+            data = data | (getPixel(buffer, x, y, sourceWidth, sourceHeight) & 1);
 
           }
+
           SendData(data);
-          //SendData(reverse(buffer[(i + j * (image_width / 8))]));
-          //SendData(i);
           yield();
       }
+      //Serial.printf("%d, %d\n", x, y);
   }
 
   DisplayFrame();
+}
+
+uint8_t EPD_WaveShare29::getPixel(uint8_t *buffer, uint16_t x, uint16_t y, uint16_t bufferWidth, uint16_t bufferHeight) {
+  uint8_t bitsPerPixel = 1;
+  uint8_t bitMask = (1 << bitsPerPixel) - 1;
+  uint8_t pixelsPerByte = 8 / bitsPerPixel;
+  uint8_t bitShift = 3;
+
+  if (x >= bufferWidth || y >= bufferHeight) return 0;
+  // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
+  // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
+  // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
+  // bitsPerPixel  1, pixPerByte: 8, 3  8 = 2^3
+  uint16_t pos = (y * bufferWidth + x) >> bitShift;
+
+  uint8_t shift = (x & (pixelsPerByte - 1)) * bitsPerPixel;
+
+  return (buffer[pos] >> shift) & bitMask;
 }
 
 int EPD_WaveShare29::IfInit(void) {
@@ -261,110 +265,7 @@ void EPD_WaveShare29::SetLut(const unsigned char* lut) {
     }
 }
 
-/**
- *  @brief: put an image buffer to the frame memory.
- *          this won't update the display.
- */
-void EPD_WaveShare29::SetFrameMemory(
-    const unsigned char* image_buffer,
-    int x,
-    int y,
-    int image_width,
-    int image_height
-) {
-    int x_end;
-    int y_end;
 
-    if (
-        image_buffer == NULL ||
-        x < 0 || image_width < 0 ||
-        y < 0 || image_height < 0
-    ) {
-        return;
-    }
-    /* x point must be the multiple of 8 or the last 3 bits will be ignored */
-    x &= 0xF8;
-    image_width &= 0xF8;
-    if (x + image_width >= this->bufferWidth) {
-        x_end = this->bufferWidth - 1;
-    } else {
-        x_end = x + image_width - 1;
-    }
-    if (y + image_height >= this->bufferHeight) {
-        y_end = this->bufferHeight - 1;
-    } else {
-        y_end = y + image_height - 1;
-    }
-    SetMemoryArea(x, y, x_end, y_end);
-    SetMemoryPointer(x, y);
-    SendCommand(WRITE_RAM);
-    /* send the image data */
-    for (int j = 0; j < y_end - y + 1; j++) {
-        for (int i = 0; i < (x_end - x + 1) / 8; i++) {
-            SendData(reverse(image_buffer[i + j * (image_width / 8)]));
-        }
-    }
-
-}
-
-uint8_t EPD_WaveShare29::getPixel(uint8_t *buffer, uint16_t x, uint16_t y) {
-  uint8_t bitsPerPixel = 1;
-  uint8_t bitMask = (1 << bitsPerPixel) - 1;
-  uint8_t pixelsPerByte = 8 / bitsPerPixel;
-  uint8_t bitShift = 3;
-
-  if (x >= bufferWidth || y >= bufferHeight) return 0;
-  // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
-  // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
-  // bitsPerPixel  2, pixPerByte: 4, 2  4 = 2^2
-  // bitsPerPixel  1, pixPerByte: 8, 3  8 = 2^3
-  uint16_t pos = (y * bufferWidth + x) >> bitShift;
-
-  uint8_t shift = (x & (pixelsPerByte - 1)) * bitsPerPixel;
-
-  return (buffer[pos] >> shift) & bitMask;
-}
-
-/**
- *  @brief: put an image buffer to the frame memory.
- *          this won't update the display.
- *
- *          Question: When do you use this function instead of
- *          void SetFrameMemory(
- *              const unsigned char* image_buffer,
- *              int x,
- *              int y,
- *              int image_width,
- *              int image_height
- *          );
- *          Answer: SetFrameMemory with parameters only reads image data
- *          from the RAM but not from the flash in AVR chips (for AVR chips,
- *          you have to use the function pgm_read_byte to read buffers
- *          from the flash).
- */
-void EPD_WaveShare29::SetFrameMemory(const unsigned char* image_buffer) {
-    SetMemoryArea(0, 0, this->width - 1, this->height - 1);
-    SetMemoryPointer(0, 0);
-    SendCommand(WRITE_RAM);
-    /* send the image data */
-    for (int i = 0; i < this->width / 8 * this->height; i++) {
-        SendData(pgm_read_byte(&image_buffer[i]));
-    }
-}
-
-/**
- *  @brief: clear the frame memory with the specified color.
- *          this won't update the display.
- */
-void EPD_WaveShare29::ClearFrameMemory(unsigned char color) {
-    SetMemoryArea(0, 0, this->width - 1, this->height - 1);
-    SetMemoryPointer(0, 0);
-    SendCommand(WRITE_RAM);
-    /* send the color data */
-    for (int i = 0; i < this->width / 8 * this->height; i++) {
-        SendData(color);
-    }
-}
 
 /**
  *  @brief: update the display
