@@ -194,10 +194,9 @@ void EPD_WaveShare75::DisplayFrame(const unsigned char* frame_buffer, uint8_t bi
                     }
                     uint8_t byteValue = getPixel(frame_buffer, x, y, bitsPerPixel);
                     // Compatibility: Black/White mode without color palette.
-                    if (pixelsPerByte == 1) {
+                    if (bitsPerPixel == 1) {
                         data |= (byteValue == 1 ?  0x03 : 0x00);
-                    }
-                    else {
+                    } else {
                         if (byteValue >= 0 && byteValue <= 2) {
                             data |= (uint8_t) palette[ byteValue ];
                         }
