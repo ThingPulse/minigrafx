@@ -93,6 +93,8 @@ class MiniGrafx {
   uint16_t getHeight();
   uint16_t getWidth();
   void setRotation(uint8_t r);
+  void setMirroredHorizontally(boolean isMirroredHorizontally);
+  void setMirroredVertically(boolean isMirroredVertically);
   void setPixel(uint16_t x, uint16_t y);
   uint16_t getPixel(uint16_t x, uint16_t y);
   void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1);
@@ -131,7 +133,10 @@ class MiniGrafx {
   void inline drawInternal(int16_t xMove, int16_t yMove, int16_t width, int16_t height, const char *data, uint16_t offset, uint16_t bytesInData);
   void commit();
   void commit(uint16_t xPos, uint16_t yPos);
+  void commit(uint16_t srcXPos, uint16_t srcYPos, uint16_t srcWidth, uint16_t srcHeight, uint16_t targetXPos, uint16_t targetYPos);
+
   void clear();
+  void freeBuffer();
   void setFastRefresh(boolean isFastRefreshEnabled);
   void fillBuffer(uint8_t pal);
   static char* utf8ascii(String s);
@@ -155,6 +160,8 @@ class MiniGrafx {
   uint16_t bitMask;
   uint8_t pixelsPerByte;
   boolean isPgmFont = true;
+  boolean isMirroredHorizontally = false;
+  boolean isMirroredVertically = false;
   const char *fontData = ArialMT_Plain_16;
   TEXT_ALIGNMENT textAlignment;
   uint8_t readFontData(const char * start, uint32_t offset);

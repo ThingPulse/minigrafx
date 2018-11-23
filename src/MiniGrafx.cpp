@@ -36,7 +36,7 @@ MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *pale
   this->initialHeight = driver->height();
   this->palette = palette;
   this->bitsPerPixel = bitsPerPixel;
-  initializeBuffer();
+  //initializeBuffer();
 
 }
 
@@ -48,7 +48,12 @@ MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *pale
   this->initialHeight = height;
   this->palette = palette;
   this->bitsPerPixel = bitsPerPixel;
-  initializeBuffer();
+}
+
+
+void MiniGrafx::init() {
+  this->initializeBuffer();
+  this->driver->init();
 }
 
 void MiniGrafx::initializeBuffer() {
@@ -90,6 +95,10 @@ void MiniGrafx::initializeBuffer() {
   }
 }
 
+void MiniGrafx::freeBuffer() {
+  free(this->buffer);
+}
+
 void MiniGrafx::changeBitDepth(uint8_t bitsPerPixel, uint16_t *palette) {
   free(this->buffer);
   initializeBuffer();
@@ -117,10 +126,6 @@ void MiniGrafx::setRotation(uint8_t m) {
      break;
   }
   this->driver->setRotation(m);
-}
-
-void MiniGrafx::init() {
-  this->driver->init();
 }
 
 void MiniGrafx::setColor(uint16_t color) {
@@ -504,7 +509,15 @@ void inline MiniGrafx::drawInternal(int16_t xMove, int16_t yMove, int16_t width,
   }
 }
 
-void MiniGrafx::setPixel(uint16_t x, uint16_t y) {
+void MiniGrafx::setPixel(uint16_t xPos, uint16_t yPos) {
+  uint16_t x = xPos;
+  uint16_t y = yPos;
+  if (isMirroredHorizontally) {
+    x = width - xPos;
+  }
+  if (isMirroredVertically) {
+    y = height - yPos;
+  }
   if (x >= width || y >= height || x < 0 || y < 0 || color < 0 || color == transparentColor) return;
   if (bitsPerPixel == 16) {
     uint32_t pos = (x + y * width) << 1;
@@ -567,6 +580,10 @@ void MiniGrafx::commit() {
 
 void MiniGrafx::commit(uint16_t xPos, uint16_t yPos) {
   this->driver->writeBuffer(buffer, bitsPerPixel, palette, xPos, yPos, this->width, this->height);
+}
+
+void MiniGrafx::commit(uint16_t srcXPos, uint16_t srcYPos, uint16_t srcWidth, uint16_t srcHeight, uint16_t targetXPos, uint16_t targetYPos) {
+
 }
 
 void MiniGrafx::setFastRefresh(boolean isFastRefreshEnabled) {
@@ -944,20 +961,22 @@ void MiniGrafx::drawPalettedBitmapFromFile(uint16_t xMove, uint16_t yMove, Strin
     return;
   }
   uint32_t fileSize = file.size();
+  Serial.println("FileSize:" + String(fileSize));
   char buf[128] = { 0 };
   file.readBytes(buf, 6);
   fileSize -= 6;
   uint8_t version = buf[0];
   uint8_t bmpBitDepth = buf[1];
+  Serial.println("Version:" + String(version));
+  Serial.println("BitDept:" + String(bmpBitDepth));
   if (bmpBitDepth != bitsPerPixel) {
-    Serial.println("Bmp has wrong bit depth");
+    Serial.printf("Bmp has wrong bit depth. Device: %d, bmp: %d\n", bitsPerPixel, bmpBitDepth);
     return;
   }
   uint16_t width = buf[2] << 8 | buf[3];
   uint16_t height = buf[4] << 8 | buf[5];
 
-  Serial.println("Version:" + String(version));
-  Serial.println("BitDept:" + String(bmpBitDepth));
+
   Serial.println("Width:  " + String(width));
   Serial.println("Height: " + String(height));
 
@@ -1114,4 +1133,12 @@ void MiniGrafx::colorSwap(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, ui
       }
     }
   }
+}
+
+void MiniGrafx::setMirroredHorizontally(boolean isMirroredHorizontally) {
+  this->isMirroredHorizontally = isMirroredHorizontally;
+}
+
+void MiniGrafx::setMirroredVertically(boolean isMirroredVertically) {
+  this->isMirroredVertically = isMirroredVertically;
 }
