@@ -70,11 +70,13 @@ MiniGrafx dialogGfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette, 96, 96);
 
 uint8_t counter = 0;
 uint8_t rotation = 0;
+uint8_t mode = 0;
+boolean modeChanged = true;
 
-void setup() {
-  Serial.begin(115200);
-  dialogGfx.init();
-  screenGfx.init();
+#define MODES 3
+
+void testFullScreenCommit() {
+
   screenGfx.setRotation(rotation);
   screenGfx.fillBuffer(MINI_WHITE);
   screenGfx.setColor(MINI_BLACK);
@@ -83,15 +85,14 @@ void setup() {
   screenGfx.drawRect(0, 0, screenGfx.getWidth() - 1, screenGfx.getHeight() - 1);
   screenGfx.drawString(0, 0, "Hello World.\nMillis: " + String(millis()) + "\nRotation: " + String(rotation));
   screenGfx.commit();
-
-
+  rotation = (rotation + 1) % 4;
 }
 
-
-
-void loop() {
-
-
+void testPictureInPicture() {
+  if (modeChanged) {
+    screenGfx.commit();
+    screenGfx.commit();
+  }
   dialogGfx.setFastRefresh(true);
   dialogGfx.setRotation(rotation);
   dialogGfx.fillBuffer(MINI_BLACK);
@@ -100,20 +101,73 @@ void loop() {
   dialogGfx.drawLine(0, 0, dialogGfx.getWidth(), dialogGfx.getHeight());
   dialogGfx.drawString(0, 0, "Hello World. Rotation:\n" + String(rotation));
   dialogGfx.commit(16, 16);
-  /*gfx.setFont(ArialMT_Plain_16);
-  gfx.drawString(10, 30, "Everything works!");
-  gfx.setFont(ArialMT_Plain_24);
-  gfx.drawString(10, 55, "Yes! Millis: \n" + String(counter));
-  long startTime = millis();
-  dialogGfx.commit(0, 0);
-  Serial.printf("Time to update screen: %d, Width %d, Height: %d\n",  millis() - startTime,  dialogGfx.getWidth(), dialogGfx.getHeight());
-  delay(1000);*/
   rotation = (rotation + 1) % 4;
-  /*if (rotation == 3) {
-    isFastRefreshEnabled = !isFastRefreshEnabled;
-    gfx.setFastRefresh(isFastRefreshEnabled);
-  }*/
+}
+
+void testWindowedCommit() {
+  if (modeChanged) {
+    screenGfx.setFastRefresh(false);
+    screenGfx.commit();
+    screenGfx.commit();
+  }
+  screenGfx.fillBuffer(MINI_BLACK);
+  screenGfx.setColor(MINI_WHITE);
+  screenGfx.setFastRefresh(true);
+  screenGfx.setRotation(0);
+  screenGfx.setFont(ArialMT_Plain_24);
+  screenGfx.drawString(18, 18, String(millis()));
+  screenGfx.commit(16, 16, 80, 32, 16, 16);
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  screenGfx.init();
+  screenGfx.fillBuffer(MINI_WHITE);
+  screenGfx.setColor(MINI_BLACK);
+  // the device thas two screen buffers. For partial update
+  // make sure that both have the same content-> clear both.
+  screenGfx.commit();
+  screenGfx.commit();
+
+  dialogGfx.init();
+
+
+}
+
+#define REPETITIONS 10
+#define MODES 4
+
+void loop() {
+  uint64_t startTime = millis();
+  switch(mode) {
+    case 0:
+      Serial.println("Testing Fullscreen commit. Fast Refresh");
+      screenGfx.setFastRefresh(true);
+      testFullScreenCommit();
+      break;
+    case 1:
+      Serial.println("Testing Fullscreen commit. Full Refresh");
+      screenGfx.setFastRefresh(false);
+      testFullScreenCommit();
+      break;
+    case 2:
+      Serial.println("Testing Picture in Picture/ Partial update");
+      dialogGfx.setFastRefresh(true);
+      testPictureInPicture();
+      break;
+    case 3:
+      Serial.println("Testing windowed commit");
+      testWindowedCommit();
+  }
+  Serial.printf("Cycle took: %dms\n", millis() - startTime );
+
   counter++;
+  modeChanged = false;
+  if (counter % REPETITIONS == 0) {
+    modeChanged = true;
+    mode = (mode + 1) % MODES;
+  }
   //delay(4000);
 
 }

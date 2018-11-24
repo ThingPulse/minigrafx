@@ -40,17 +40,29 @@ Demo for the buffered graphics library. Renders a 3D cube
 
 
 struct BufferInfo {
+  // the frame buffer
   uint8_t *buffer;
+  // number of bits used for one pixel
   uint8_t bitsPerPixel;
+  // the palette in case the framebuffer uses a different bit depth than the display
   uint16_t *palette;
-  uint16_t srcX;
-  uint16_t srcY;
-  uint16_t targetX;
-  uint16_t targetY;
-  uint16_t bufferWidth;
-  uint16_t bufferHeight;
+  // x origin of the area to copy
+  uint16_t windowX;
+  // y origin of the area to copy
+  uint16_t windowY;
+  // width of the area to be copied
   uint16_t windowWidth;
+  // height of the area to be copied
   uint16_t windowHeight;
+  // x where to copy the window to
+  uint16_t targetX;
+  // y where to copy the window to
+  uint16_t targetY;
+  // width of the source buffer
+  uint16_t bufferWidth;
+  // height of the source buffer
+  uint16_t bufferHeight;
+
 };
 
 class DisplayDriver {

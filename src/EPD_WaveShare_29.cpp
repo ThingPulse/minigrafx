@@ -75,28 +75,25 @@ void EPD_WaveShare29::writeBuffer(BufferInfo *bufferInfo) {
   uint16_t targetHeight = this->height;
   uint16_t sourceWidth = bufferInfo->bufferWidth;
   uint16_t sourceHeight = bufferInfo->bufferHeight;
+  uint16_t windowWidth = bufferInfo->windowWidth;
+  uint16_t windowHeight = bufferInfo->windowHeight;
   switch(rotation) {
     case 0:
-      targetWidth = bufferInfo->bufferWidth;
-      targetHeight = bufferInfo->bufferHeight;
+    case 2:
+      targetWidth = windowWidth;
+      targetHeight = windowHeight;
       break;
     case 1:
-      targetWidth = bufferInfo->bufferHeight;
-      targetHeight = bufferInfo->bufferWidth;
-      break;
-    case 2:
-      targetWidth = bufferInfo->bufferWidth;
-      targetHeight = bufferInfo->bufferHeight;
-      break;
     case 3:
-      targetWidth = bufferInfo->bufferHeight;
-      targetHeight = bufferInfo->bufferWidth;
+      targetWidth = windowHeight;
+      targetHeight = windowWidth;
       break;
   }
 
   Serial.printf("Rotation: %d, XPos: %d, YPos: %d, Source width: %d, height: %d, target width: %d, height: %d\n", rotation, xPos, yPos, sourceWidth, sourceHeight, targetWidth, targetHeight);
 
   uint8_t data;
+  uint8_t bufferUpdates = this->isFastRefreshEnabled ? 1 : 1;
 
   SetMemoryArea(xPos, yPos, xPos + targetWidth - 1, yPos + targetHeight - 1);
   SetMemoryPointer(xPos, yPos);
@@ -127,18 +124,20 @@ void EPD_WaveShare29::writeBuffer(BufferInfo *bufferInfo) {
                 y = sourceHeight - (j * 8 + b);
                 break;
             }
+
             //
-            data = data | (getPixel(bufferInfo->buffer, x, y, sourceWidth, sourceHeight) & 1);
+            data = data | (getPixel(bufferInfo->buffer, bufferInfo->windowX + x, bufferInfo->windowY + y, sourceWidth, sourceHeight) & 1);
 
           }
 
           SendData(data);
           yield();
       }
-      //Serial.printf("%d, %d\n", x, y);
-  }
 
-  DisplayFrame();
+    }
+
+    DisplayFrame();
+
 }
 
 uint8_t EPD_WaveShare29::getPixel(uint8_t *buffer, uint16_t x, uint16_t y, uint16_t bufferWidth, uint16_t bufferHeight) {
@@ -277,7 +276,7 @@ void EPD_WaveShare29::SetLut(const unsigned char* lut) {
  */
 void EPD_WaveShare29::DisplayFrame(void) {
     SendCommand(DISPLAY_UPDATE_CONTROL_2);
-    SendData(0xC4);
+    SendData(0xc4);
     SendCommand(MASTER_ACTIVATION);
     SendCommand(TERMINATE_FRAME_READ_WRITE);
     WaitUntilIdle();

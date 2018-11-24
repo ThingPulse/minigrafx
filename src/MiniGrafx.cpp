@@ -583,6 +583,10 @@ void MiniGrafx::commit() {
   bufferInfo.targetY = 0;
   bufferInfo.bufferWidth = this->width;
   bufferInfo.bufferHeight = this->height;
+  bufferInfo.windowX = 0;
+  bufferInfo.windowY = 0;
+  bufferInfo.windowWidth = this->width;
+  bufferInfo.windowHeight = this->height;
   this->driver->writeBuffer(&bufferInfo);
 }
 
@@ -595,11 +599,27 @@ void MiniGrafx::commit(uint16_t xPos, uint16_t yPos) {
   bufferInfo.targetY = yPos;
   bufferInfo.bufferWidth = this->width;
   bufferInfo.bufferHeight = this->height;
+  bufferInfo.windowX = 0;
+  bufferInfo.windowY = 0;
+  bufferInfo.windowWidth = this->width;
+  bufferInfo.windowHeight = this->height;
   this->driver->writeBuffer(&bufferInfo);
 }
 
 void MiniGrafx::commit(uint16_t srcXPos, uint16_t srcYPos, uint16_t srcWidth, uint16_t srcHeight, uint16_t targetXPos, uint16_t targetYPos) {
-
+  BufferInfo bufferInfo;
+  bufferInfo.buffer = this->buffer;
+  bufferInfo.bitsPerPixel = this->bitsPerPixel;
+  bufferInfo.palette = this->palette;
+  bufferInfo.targetX = targetXPos;
+  bufferInfo.targetY = targetYPos;
+  bufferInfo.bufferWidth = this->width;
+  bufferInfo.bufferHeight = this->height;
+  bufferInfo.windowX = srcXPos;
+  bufferInfo.windowY = srcXPos;
+  bufferInfo.windowWidth = srcWidth;
+  bufferInfo.windowHeight = srcHeight;
+  this->driver->writeBuffer(&bufferInfo);
 }
 
 void MiniGrafx::setFastRefresh(boolean isFastRefreshEnabled) {
