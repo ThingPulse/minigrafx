@@ -575,11 +575,27 @@ void MiniGrafx::clear() {
 }
 
 void MiniGrafx::commit() {
-  this->driver->writeBuffer(buffer, bitsPerPixel, palette, 0, 0, this->width, this->height);
+  BufferInfo bufferInfo;
+  bufferInfo.buffer = this->buffer;
+  bufferInfo.bitsPerPixel = this->bitsPerPixel;
+  bufferInfo.palette = this->palette;
+  bufferInfo.targetX = 0;
+  bufferInfo.targetY = 0;
+  bufferInfo.bufferWidth = this->width;
+  bufferInfo.bufferHeight = this->height;
+  this->driver->writeBuffer(&bufferInfo);
 }
 
 void MiniGrafx::commit(uint16_t xPos, uint16_t yPos) {
-  this->driver->writeBuffer(buffer, bitsPerPixel, palette, xPos, yPos, this->width, this->height);
+  BufferInfo bufferInfo;
+  bufferInfo.buffer = this->buffer;
+  bufferInfo.bitsPerPixel = this->bitsPerPixel;
+  bufferInfo.palette = this->palette;
+  bufferInfo.targetX = xPos;
+  bufferInfo.targetY = yPos;
+  bufferInfo.bufferWidth = this->width;
+  bufferInfo.bufferHeight = this->height;
+  this->driver->writeBuffer(&bufferInfo);
 }
 
 void MiniGrafx::commit(uint16_t srcXPos, uint16_t srcYPos, uint16_t srcWidth, uint16_t srcHeight, uint16_t targetXPos, uint16_t targetYPos) {

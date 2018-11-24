@@ -64,32 +64,33 @@ void EPD_WaveShare29::setFastRefresh(boolean isFastRefreshEnabled) {
 
 }
 
-void EPD_WaveShare29::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t xPosOrig, uint16_t yPosOrig, uint16_t bufferWidth, uint16_t bufferHeight) {
+// uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t xPosOrig, uint16_t yPosOrig, uint16_t bufferWidth, uint16_t bufferHeight
+void EPD_WaveShare29::writeBuffer(BufferInfo *bufferInfo) {
   //SetFrameMemory(buffer, 0, 0, EPD_WIDTH, EPD_HEIGHT);
-  uint16_t xPos = (xPosOrig / 8) * 8;
-  uint16_t yPos = yPosOrig;
+  uint16_t xPos = (bufferInfo->targetX / 8) * 8;
+  uint16_t yPos = bufferInfo->targetY;
   uint16_t x = 0;
   uint16_t y = 0;
-  uint16_t targetWidth = width;
-  uint16_t targetHeight = height;
-  uint16_t sourceWidth = bufferWidth;
-  uint16_t sourceHeight = bufferHeight;
+  uint16_t targetWidth = this->width;
+  uint16_t targetHeight = this->height;
+  uint16_t sourceWidth = bufferInfo->bufferWidth;
+  uint16_t sourceHeight = bufferInfo->bufferHeight;
   switch(rotation) {
     case 0:
-      targetWidth = bufferWidth;
-      targetHeight = bufferHeight;
+      targetWidth = bufferInfo->bufferWidth;
+      targetHeight = bufferInfo->bufferHeight;
       break;
     case 1:
-      targetWidth = bufferHeight;
-      targetHeight = bufferWidth;
+      targetWidth = bufferInfo->bufferHeight;
+      targetHeight = bufferInfo->bufferWidth;
       break;
     case 2:
-      targetWidth = bufferWidth;
-      targetHeight = bufferHeight;
+      targetWidth = bufferInfo->bufferWidth;
+      targetHeight = bufferInfo->bufferHeight;
       break;
     case 3:
-      targetWidth = bufferHeight;
-      targetHeight = bufferWidth;
+      targetWidth = bufferInfo->bufferHeight;
+      targetHeight = bufferInfo->bufferWidth;
       break;
   }
 
@@ -127,7 +128,7 @@ void EPD_WaveShare29::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_
                 break;
             }
             //
-            data = data | (getPixel(buffer, x, y, sourceWidth, sourceHeight) & 1);
+            data = data | (getPixel(bufferInfo->buffer, x, y, sourceWidth, sourceHeight) & 1);
 
           }
 

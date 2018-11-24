@@ -39,6 +39,20 @@ Demo for the buffered graphics library. Renders a 3D cube
 #endif
 
 
+struct BufferInfo {
+  uint8_t *buffer;
+  uint8_t bitsPerPixel;
+  uint16_t *palette;
+  uint16_t srcX;
+  uint16_t srcY;
+  uint16_t targetX;
+  uint16_t targetY;
+  uint16_t bufferWidth;
+  uint16_t bufferHeight;
+  uint16_t windowWidth;
+  uint16_t windowHeight;
+};
+
 class DisplayDriver {
 
  public:
@@ -47,7 +61,7 @@ class DisplayDriver {
 
   virtual void setRotation(uint8_t r);
   virtual void init() = 0;
-  virtual void writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t x, uint16_t y, uint16_t bufferWidth, uint16_t bufferHeight) = 0;
+  virtual void writeBuffer(BufferInfo *bufferInfo) = 0;
   virtual void setFastRefresh(boolean isEnabled) = 0;
 
   int16_t height(void) const;
