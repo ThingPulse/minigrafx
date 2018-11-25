@@ -141,8 +141,8 @@ int EPD_WaveShare42::IfInit(void) {
 
 
 
-void EPD_WaveShare42::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t x, uint16_t y, uint16_t bufferWidth, uint16_t bufferHeight) {
-  DisplayFrame(buffer);
+void EPD_WaveShare42::writeBuffer(BufferInfo *bufferInfo) {
+  DisplayFrame(bufferInfo->buffer);
 }
 
 /**
