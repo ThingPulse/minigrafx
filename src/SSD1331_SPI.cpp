@@ -237,8 +237,14 @@ void SSD1331_SPI::setRotation(uint8_t r) {
 
 }
 
-void SSD1331_SPI::writeBuffer(uint8_t *buffer, uint8_t bitsPerPixel, uint16_t *palette, uint16_t xPos, uint16_t yPos, uint16_t bufferWidth, uint16_t bufferHeight) {
-
+void SSD1331_SPI::writeBuffer(BufferInfo *bufferInfo) {
+      uint8_t *buffer = bufferInfo->buffer;
+      uint16_t bufferWidth = bufferInfo->bufferWidth;
+      uint16_t bufferHeight = bufferInfo->bufferHeight;
+      uint16_t xPos = bufferInfo->targetX;
+      uint16_t yPos = bufferInfo->targetY;
+      uint16_t *palette = bufferInfo->palette;
+      uint8_t bitsPerPixel = bufferInfo->bitsPerPixel;
 
       setAddrWindow(xPos, yPos, xPos + bufferWidth - 1, yPos + bufferHeight -1 );
 
