@@ -20,7 +20,7 @@ env:
 
 install:
     - pip install -U platformio
-    - platformio lib install "XPT2046_Touchscreen"
+    - platformio lib install "XPT2046_Touchscreen" "EspSoftwareSerial@3.4.1"
     - platformio lib update
 
 script:
