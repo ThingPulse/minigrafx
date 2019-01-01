@@ -2,10 +2,10 @@
 #ifndef _MINIGRAFX_CSN_A2_
 #define _MINIGRAFX_CSN_A2_
 
-#include <SPI.h>
 #include <Arduino.h>
-#include "DisplayDriver.h"
 #include <SoftwareSerial.h>
+#include "DisplayDriver.h"
+
 
 
 #define CSN_A2_WIDTH 384
