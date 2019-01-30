@@ -77,30 +77,23 @@ void EPD_WaveShare42::init() {
   }
   /* EPD hardware init start */
   Reset();
-  SendCommand(POWER_SETTING);
-  SendData(0x03);                  // VDS_EN, VDG_EN
-  SendData(0x00);                  // VCOM_HV, VGHL_LV[1], VGHL_LV[0]
-  SendData(0x2b);                  // VDH
-  SendData(0x2b);                  // VDL
-  SendData(0xff);                  // VDHR
-  SendCommand(BOOSTER_SOFT_START);
-  SendData(0x17);
-  SendData(0x17);
-  SendData(0x17);                  //07 0f 17 1f 27 2F 37 2f
+  SendCommand(BOOSTER_SOFT_START);         //boost soft start
+  SendData (0x37);   //A, default 0x17, 3F has max contrast
+  SendData (0x37);   //B,
+  SendData (0x37);   //C
+
   SendCommand(POWER_ON);
-  WaitUntilIdle();
-  SendCommand(PANEL_SETTING);
-  SendData(0xbf);    // KW-BF   KWR-AF  BWROTP 0f
-  SendData(0x0b);
-  SendCommand(PLL_CONTROL);
-  SendData(0x3c);        // 3A 100HZ   29 150Hz 39 200HZ  31 171HZ
-  /* EPD hardware init end */
+
+  SendCommand(PANEL_SETTING);     //panel setting
+  SendData(0x1f);    //LUT from OTP
+  SendData(0x0d);    //VCOM to 0V
+
   return;
 
 }
 
 void EPD_WaveShare42::setFastRefresh(boolean isFastRefreshEnabled) {
-  // Not enabled at the moment
+  this->isFastRefreshEnabled = isFastRefreshEnabled;
 }
 
 void EPD_WaveShare42::DigitalWrite(int pin, int value) {
@@ -123,17 +116,16 @@ void EPD_WaveShare42::SpiTransfer(unsigned char data) {
 
 int EPD_WaveShare42::IfInit(void) {
     Serial.println("Setting pin modes");
-    digitalWrite(this->csPin, HIGH);
     pinMode(this->csPin, OUTPUT);
-    digitalWrite(this->rstPin, HIGH);
+    digitalWrite(this->csPin, HIGH);
     pinMode(this->rstPin, OUTPUT);
+    //digitalWrite(this->rstPin, HIGH);
     digitalWrite(this->dcPin, HIGH);
     pinMode(this->dcPin, OUTPUT);
-    digitalWrite(this->busyPin, HIGH);
-    pinMode(this->busyPin, OUTPUT);
+    pinMode(this->busyPin, INPUT);
     Serial.println("Starting SPI transaction");
     SPI.begin();
-    SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
+    SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
     Serial.println("Beginning SPI");
 
     return 0;
@@ -165,9 +157,19 @@ void EPD_WaveShare42::SendData(unsigned char data) {
  *  @brief: Wait until the busy_pin goes HIGH
  */
 void EPD_WaveShare42::WaitUntilIdle(void) {
-    while(DigitalRead(this->busyPin) == 0) {      //0: busy, 1: idle
-        DelayMs(100);
-    }
+    Serial.println("Waiting until idle: ");
+    uint32_t startMillis = millis();
+    unsigned char busy;
+    do {
+      SendCommand(GET_STATUS);
+      busy = DigitalRead(this->busyPin);
+      busy =!(busy & 0x01);
+      DelayMs(20);
+      if (millis() - startMillis > DISPLAY_TIMEOUT) {
+        Serial.println("Display timeout reached");
+        return;
+      }
+    } while (busy);
 }
 
 /**
@@ -217,26 +219,51 @@ void EPD_WaveShare42::SetPartialWindow(const unsigned char* buffer_black, int x,
  */
 void EPD_WaveShare42::SetLut(void) {
     unsigned int count;
+    const unsigned char *lut;
+    if (isFastRefreshEnabled) {
+      lut = lut_vcom0_quick;
+    } else {
+      lut = lut_vcom0;
+    }
+    SendCommand(PANEL_SETTING);
+    SendData(0x3F); //300x400 B/W mode, LUT set by register
     SendCommand(LUT_FOR_VCOM);                            //vcom
     for(count = 0; count < 44; count++) {
-        SendData(lut_vcom0[count]);
-    }
+      SendData(lut[count]);
 
+    }
+    if (isFastRefreshEnabled) {
+      lut = lut_ww_quick;
+    } else {
+      lut = lut_ww;
+    }
     SendCommand(LUT_WHITE_TO_WHITE);                      //ww --
     for(count = 0; count < 42; count++) {
-        SendData(lut_ww[count]);
+        SendData(lut[count]);
     }
-
+    if (isFastRefreshEnabled) {
+      lut = lut_bw_quick;
+    } else {
+      lut = lut_bw;
+    }
     SendCommand(LUT_BLACK_TO_WHITE);                      //bw r
     for(count = 0; count < 42; count++) {
-        SendData(lut_bw[count]);
+      SendData(lut[count]);
     }
-
+    if (isFastRefreshEnabled) {
+      lut = lut_bb_quick;
+    } else {
+      lut = lut_bb;
+    }
     SendCommand(LUT_WHITE_TO_BLACK);                      //wb w
     for(count = 0; count < 42; count++) {
-        SendData(lut_bb[count]);
+      SendData(lut[count]);
     }
-
+    if (isFastRefreshEnabled) {
+      lut = lut_wb_quick;
+    } else {
+      lut = lut_wb;
+    }
     SendCommand(LUT_BLACK_TO_BLACK);                      //bb b
     for(count = 0; count < 42; count++) {
         SendData(lut_wb[count]);
@@ -268,14 +295,14 @@ void EPD_WaveShare42::DisplayFrame(const unsigned char* frame_buffer) {
     SendData(0x12);
 
     SendCommand(VCOM_AND_DATA_INTERVAL_SETTING);
-    SendCommand(0x97);    //VBDF 17|D7 VBDW 97  VBDB 57  VBDF F7  VBDW 77  VBDB 37  VBDR B7
+    SendData(0x97);    //VBDF 17|D7 VBDW 97  VBDB 57  VBDF F7  VBDW 77  VBDB 37  VBDR B7
 
     if (frame_buffer != NULL) {
-        /*SendCommand(DATA_START_TRANSMISSION_1);
+        SendCommand(DATA_START_TRANSMISSION_1);
         for(int i = 0; i < width / 8 * height; i++) {
             SendData(0xFF);      // bit set: white, bit reset: black
         }
-        DelayMs(2);*/
+        DelayMs(2);
         /*SendCommand(DATA_START_TRANSMISSION_2);
         for(int i = 0; i < width / 8 * height; i++) {
             SendData(reverse(frame_buffer[i]));
@@ -294,16 +321,16 @@ void EPD_WaveShare42::DisplayFrame(const unsigned char* frame_buffer) {
                       y = i;
                       break;
                     case 1:
-                      x = bufferWidth - i;
+                      x = bufferWidth - i - 1;
                       y = (j * 8 + b);
                       break;
                     case 2:
-                      x = xDot - (j * 8 + b);
-                      y = yDot - i;
+                      x = xDot - (j * 8 + b) - 1;
+                      y = yDot - i - 1;
                       break;
                     case 3:
                       x = i;
-                      y = bufferHeight - (j * 8 + b);
+                      y = bufferHeight - (j * 8 + b) - 1;
                       break;
                   }
                   data = data | (getPixel(frame_buffer, x, y) & 1);
