@@ -112,16 +112,16 @@ void EPD_WaveShare29::writeBuffer(BufferInfo *bufferInfo) {
                 y = i;
                 break;
               case 1:
-                x = sourceWidth - i;
+                x = sourceWidth - i - 1;
                 y = (j * 8 + b);
                 break;
               case 2:
-                x = sourceWidth - (j * 8 + b);
-                y = sourceHeight - i;
+                x = sourceWidth - (j * 8 + b) - 1;
+                y = sourceHeight - i - 1;
                 break;
               case 3:
                 x = i;
-                y = sourceHeight - (j * 8 + b);
+                y = sourceHeight - (j * 8 + b) - 1;
                 break;
             }
 
