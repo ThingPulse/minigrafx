@@ -106,7 +106,7 @@ class MiniGrafx {
   void fillCircle(int16_t x0, int16_t y0, int16_t radius);
   void drawHorizontalLine(int16_t x, int16_t y, int16_t length);
   void drawVerticalLine(int16_t x, int16_t y, int16_t length);
-  void drawString(int16_t xMove, int16_t yMove, String strUser);
+  uint16_t drawString(int16_t xMove, int16_t yMove, String strUser);
 
   // Draws a String with a maximum width at the given location.
   // If the given String is wider than the specified width

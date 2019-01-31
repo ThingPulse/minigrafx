@@ -255,7 +255,7 @@ void MiniGrafx::drawVerticalLine(int16_t x, int16_t y, int16_t length) {
 
 }
 
-void MiniGrafx::drawString(int16_t xMove, int16_t yMove, String strUser) {
+uint16_t MiniGrafx::drawString(int16_t xMove, int16_t yMove, String strUser) {
   uint16_t lineHeight = readFontData(fontData, HEIGHT_POS);
 
   // char* text must be freed!
@@ -276,12 +276,17 @@ void MiniGrafx::drawString(int16_t xMove, int16_t yMove, String strUser) {
 
   uint16_t line = 0;
   char* textPart = strtok(text,"\n");
+  uint16_t maxStringWidth = 0;
+  uint16_t stringWidth = 0;
   while (textPart != NULL) {
     uint16_t length = strlen(textPart);
-    drawStringInternal(xMove, yMove - yOffset + (line++) * lineHeight, textPart, length, getStringWidth(textPart, length));
+    stringWidth = getStringWidth(textPart, length);
+    maxStringWidth = max(maxStringWidth, stringWidth);
+    drawStringInternal(xMove, yMove - yOffset + (line++) * lineHeight, textPart, length, stringWidth);
     textPart = strtok(NULL, "\n");
   }
   free(text);
+  return stringWidth;
 }
 
 void MiniGrafx::drawStringMaxWidth(int16_t xMove, int16_t yMove, uint16_t maxLineWidth, String strUser) {
