@@ -426,7 +426,7 @@ void EPD_WaveShare42::DisplayFrame(void) {
  *         You can use Epd::Reset() to awaken and use Epd::Init() to initialize.
  */
 void EPD_WaveShare42::Sleep() {
-    SendCommand(VCOM_AND_DATA_INTERVAL_SETTING);
+    /*SendCommand(VCOM_AND_DATA_INTERVAL_SETTING);
     SendData(0x17);                       //border floating
     SendCommand(VCM_DC_SETTING);          //VCOM to 0V
     SendCommand(PANEL_SETTING);
@@ -438,7 +438,7 @@ void EPD_WaveShare42::Sleep() {
     SendData(0x00);
     SendData(0x00);
     SendData(0x00);
-    DelayMs(100);
+    DelayMs(100);*/
 
     SendCommand(POWER_OFF);          //power off
     WaitUntilIdle();
