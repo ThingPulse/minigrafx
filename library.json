@@ -6,14 +6,14 @@
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/squix78/minigrafx"
+    "url": "https://github.com/ThingPulse/minigrafx "
   },
   "authors":
   [
     {
         "name": "Daniel Eichhorn",
         "email": "squix78@gmail.com",
-        "url": "https://blog.squix.org"
+        "url": "https://www.thingpulse.com"
     }
   ],
   "frameworks": "arduino",
