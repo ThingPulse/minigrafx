@@ -72,11 +72,14 @@ uint16_t palette[] = {0, 1};
 
 EPD_WaveShare42 epd(CS, RST, DC, BUSY);
 MiniGrafx gfx = MiniGrafx(&epd, BITS_PER_PIXEL, palette);
+uint32_t startMillis;
 
 void setup() {
+  startMillis = millis();
   Serial.begin(115200);
   gfx.init();
-  gfx.setRotation(1);
+  gfx.setRotation(0);
+  gfx.setFastRefresh(false);
 }
 
 uint8_t rotation = 0;
@@ -94,8 +97,14 @@ void loop() {
   gfx.drawString(10, 30, "Everything works!");
   gfx.setFont(ArialMT_Plain_24);
   gfx.drawString(10, 55, "Yes! Millis: " + String(millis()));
+  gfx.drawString(10, 80, "Rotation: " + String(rotation));
+  Serial.printf("Time until commit: %dms\n", (millis() - startMillis));
   gfx.commit();
+
   rotation = (rotation + 1) % 4;
-  delay(5000);
+  epd.Sleep();
+  Serial.printf("Time before sleep: %dms\n", (millis() - startMillis));
+  ESP.deepSleep(30 * 1000000, WAKE_RF_DEFAULT );
+  //delay(3000);
 
 }
