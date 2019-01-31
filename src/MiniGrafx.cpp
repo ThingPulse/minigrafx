@@ -237,7 +237,7 @@ void MiniGrafx::fillCircle(int16_t x0, int16_t y0, int16_t radius) {
 
 void MiniGrafx::drawHorizontalLine(int16_t x, int16_t y, int16_t length) {
   int16_t x1 = x;
-  int16_t x2 = x + length + 1;
+  int16_t x2 = x + length - 1;
   if (x1 > x2) {
     _swap_int16_t(x1, x2);
   }
