@@ -205,8 +205,8 @@ void MiniGrafx::drawCircle(int16_t x0, int16_t y0, uint16_t radius) {
 void MiniGrafx::drawRect(int16_t x, int16_t y, int16_t width, int16_t height) {
   drawHorizontalLine(x, y, width);
   drawVerticalLine(x, y, height);
-  drawVerticalLine(x + width + 1, y, height);
-  drawHorizontalLine(x, y + height - 1, width);
+  drawVerticalLine(x + width, y, height);
+  drawHorizontalLine(x, y + height, width);
 }
 
 void MiniGrafx::fillRect(int16_t xMove, int16_t yMove, int16_t width, int16_t height) {
