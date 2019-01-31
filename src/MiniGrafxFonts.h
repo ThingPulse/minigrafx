@@ -1,3 +1,30 @@
+/**
+The MIT License (MIT)
+Copyright (c) 2019 by Daniel Eichhorn, ThingPulse
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Please note: We are spending a lot of time to write and maintain open source codes
+Please support us by buying our products from https://thingpulse.com/shop/
+
+See more at https://thigpulse.com
+
+Many thanks go to various contributors such as Adafruit, Waveshare.
+*/
+
 #ifndef MINIGRAFXFONTS_h
 #define MINIGRAFXFONTS_h
 
@@ -1271,5 +1298,4 @@ const char ArialMT_Plain_24[] PROGMEM = {
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xE0,0xFF,0xFF,0x07,0xE0,0xFF,0xFF,0x07,0x00,0x1C,0x18,0x00,0x00,0x06,0x30,0x00,0x00,0x06,0x30,0x00,0x00,0x06,0x30,0x00,0x00,0x0E,0x38,0x00,0x00,0x1C,0x1C,0x00,0x00,0xF8,0x0F,0x00,0x00,0xF0,0x03, // 254
   0x00,0x00,0x00,0x00,0x00,0x0E,0x00,0x00,0x00,0x7E,0x00,0x06,0xC0,0xF0,0x01,0x06,0xC0,0x80,0x0F,0x07,0x00,0x00,0xFE,0x03,0x00,0x00,0xFC,0x00,0xC0,0xC0,0x1F,0x00,0xC0,0xF8,0x03,0x00,0x00,0x3E,0x00,0x00,0x00,0x06 // 255
 };
-#endif 
-
+#endif

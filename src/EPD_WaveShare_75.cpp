@@ -1,6 +1,6 @@
 /**
 The MIT License (MIT)
-Copyright (c) 2017 by Daniel Eichhorn
+Copyright (c) 2019 by Daniel Eichhorn, ThingPulse
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -17,15 +17,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Please note: I am spending a lot of my free time in developing Software and Hardware
-for these projects. Please consider supporting me by
-a) Buying my hardware kits from https://blog.squix.org/shop
-b) Send a donation: https://www.paypal.me/squix/5USD
-c) Or using this affiliate link while shopping: https://www.banggood.com/?p=6R31122484684201508S
+Please note: We are spending a lot of time to write and maintain open source codes
+Please support us by buying our products from https://thingpulse.com/shop/
 
-See more at https://blog.squix.org
+See more at https://thigpulse.com
 
-This code is based on a driver from http://waveshare.com
+Many thanks go to various contributors such as Adafruit, Waveshare.
 */
 
 #include <stdlib.h>
