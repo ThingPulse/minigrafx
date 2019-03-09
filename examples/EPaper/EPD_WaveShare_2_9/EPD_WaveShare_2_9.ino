@@ -53,10 +53,17 @@ Demo for the buffered graphics library. Renders a 3D cube
 #define DC D8
 #define BUSY D1*/
 
-#define CS 15  // D8
-#define RST 2  // D4
-#define DC 5   // D1
-#define BUSY 4 // D2
+#if defined(ESP8266) 
+  #define CS 15  // D8
+  #define RST 2  // D4
+  #define DC 5   // D1
+  #define BUSY 4 // D2
+#elif defined(ESP32)
+  #define CS 5  // D8
+  #define RST 12  // D4
+  #define DC 19   // D1
+  #define BUSY 4 // D2
+#endif
 
 #define BITS_PER_PIXEL 1
 
