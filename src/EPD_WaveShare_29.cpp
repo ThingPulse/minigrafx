@@ -86,10 +86,7 @@ void EPD_WaveShare29::writeBuffer(BufferInfo *bufferInfo) {
       break;
   }
 
-  Serial.printf("Rotation: %d, XPos: %d, YPos: %d, Source width: %d, height: %d, target width: %d, height: %d\n", rotation, xPos, yPos, sourceWidth, sourceHeight, targetWidth, targetHeight);
-
   uint8_t data;
-  uint8_t bufferUpdates = this->isFastRefreshEnabled ? 1 : 1;
 
   SetMemoryArea(xPos, yPos, xPos + targetWidth - 1, yPos + targetHeight - 1);
   SetMemoryPointer(xPos, yPos);
@@ -155,11 +152,13 @@ uint8_t EPD_WaveShare29::getPixel(uint8_t *buffer, uint16_t x, uint16_t y, uint1
 }
 
 int EPD_WaveShare29::IfInit(void) {
-    digitalWrite(this->cs_pin, OUTPUT);
+    pinMode(this->cs_pin, OUTPUT);
     pinMode(this->reset_pin, OUTPUT);
     pinMode(this->dc_pin, OUTPUT);
     pinMode(this->busy_pin, INPUT);
-    SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
+    SPI.setBitOrder(MSBFIRST);  
+    SPI.setDataMode(SPI_MODE0);
+    SPI.setFrequency(4000000);
     SPI.begin();
     return 0;
 }
@@ -188,6 +187,7 @@ int EPD_WaveShare29::Init(const unsigned char* lut) {
     if (IfInit() != 0) {
         return -1;
     }
+
     /* EPD hardware init start */
     this->lut = lut;
     Reset();
@@ -232,9 +232,19 @@ void EPD_WaveShare29::SendData(unsigned char data) {
  *  @brief: Wait until the busy_pin goes LOW
  */
 void EPD_WaveShare29::WaitUntilIdle(void) {
-    while(DigitalRead(busy_pin) == HIGH) {      //LOW: idle, HIGH: busy
-        DelayMs(100);
+    Serial.println(F("Waiting for display idle"));
+    unsigned long start = micros();
+    while (1) {
+      if (digitalRead(this->busy_pin) == LOW) {
+        break;
+      }
+      delay(1);
+      if (micros() - start > 10000000) {
+        Serial.println(F("Busy Timeout!"));
+        break;
+      }
     }
+    Serial.println(F("Display ready"));
 }
 
 /**
