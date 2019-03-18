@@ -112,7 +112,7 @@ void loop() {
   gfx.fillBuffer(0);
   gfx.setColor(color);
   gfx.drawBmpFromFile("file.bmp", 10, 40 + counter);
-  //gfx.drawBmp(image, 10, 40);
+  //gfx.drawBmpFromPgm(image, 10, 40);
   gfx.setColor(15);
   gfx.drawString(2, 2, fps);
   for (int i = 0; i < 16; i++) {
