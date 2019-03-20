@@ -202,6 +202,8 @@ int8_t Carousel::update(){
 
     this->state.lastUpdate = frameStart;
     this->tick();
+  } else {
+    this->drawFrame();
   }
   return this->updateInterval - (millis() - frameStart);
 }
