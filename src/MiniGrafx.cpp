@@ -1007,7 +1007,7 @@ void MiniGrafx::drawPalettedBitmapFromFile(uint16_t xMove, uint16_t yMove, Strin
   uint8_t version = buf[0];
   uint8_t bmpBitDepth = buf[1];
   Serial.println("Version:" + String(version));
-  Serial.println("BitDept:" + String(bmpBitDepth));
+  Serial.println("BitDepth:" + String(bmpBitDepth));
   if (bmpBitDepth != bitsPerPixel) {
     Serial.printf("Bmp has wrong bit depth. Device: %d, bmp: %d\n", bitsPerPixel, bmpBitDepth);
     return;
