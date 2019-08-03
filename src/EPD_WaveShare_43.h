@@ -20,7 +20,7 @@ SOFTWARE.
 Please note: We are spending a lot of time to write and maintain open source codes
 Please support us by buying our products from https://thingpulse.com/shop/
 
-See more at https://thigpulse.com
+See more at https://thingpulse.com
 
 Many thanks go to various contributors such as Adafruit, Waveshare.
 */
