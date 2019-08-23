@@ -20,7 +20,7 @@ SOFTWARE.
 Please note: We are spending a lot of time to write and maintain open source codes
 Please support us by buying our products from https://thingpulse.com/shop/
 
-See more at https://thigpulse.com
+See more at https://thingpulse.com
 
 Many thanks go to various contributors such as Adafruit, Waveshare.
 */
@@ -1007,7 +1007,7 @@ void MiniGrafx::drawPalettedBitmapFromFile(uint16_t xMove, uint16_t yMove, Strin
   uint8_t version = buf[0];
   uint8_t bmpBitDepth = buf[1];
   Serial.println("Version:" + String(version));
-  Serial.println("BitDept:" + String(bmpBitDepth));
+  Serial.println("BitDepth:" + String(bmpBitDepth));
   if (bmpBitDepth != bitsPerPixel) {
     Serial.printf("Bmp has wrong bit depth. Device: %d, bmp: %d\n", bitsPerPixel, bmpBitDepth);
     return;
