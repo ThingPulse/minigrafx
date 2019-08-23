@@ -4,3 +4,5 @@
 .gcc-flags.json
 .vscode
 .vscode/*
+.pio
+.pio/*
