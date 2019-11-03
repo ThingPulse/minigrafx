@@ -216,16 +216,20 @@ int EPD_WaveShare29::Init(const unsigned char* lut) {
  *  @brief: basic function for sending commands
  */
 void EPD_WaveShare29::SendCommand(unsigned char command) {
+    DigitalWrite(cs_pin, LOW);
     DigitalWrite(dc_pin, LOW);
     SpiTransfer(command);
+    DigitalWrite(cs_pin, LOW);
 }
 
 /**
  *  @brief: basic function for sending data
  */
 void EPD_WaveShare29::SendData(unsigned char data) {
+    DigitalWrite(cs_pin, LOW);
     DigitalWrite(dc_pin, HIGH);
     SpiTransfer(data);
+    DigitalWrite(cs_pin, HIGH);
 }
 
 /**
@@ -235,6 +239,7 @@ void EPD_WaveShare29::WaitUntilIdle(void) {
     Serial.println(F("Waiting for display idle"));
     unsigned long start = micros();
     while (1) {
+      SendCommand(0x71);
       if (digitalRead(this->busy_pin) == LOW) {
         break;
       }
