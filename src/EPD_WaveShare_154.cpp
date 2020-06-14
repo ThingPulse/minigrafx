@@ -339,11 +339,14 @@ uint8_t EPD_WaveShare154::reverse(uint8_t in)
  *          You can use Epd::Init() to awaken
  */
 void EPD_WaveShare154::Sleep() {
-    digitalWrite(this->cs_pin, LOW);
-    digitalWrite(this->reset_pin, LOW);
-    digitalWrite(this->dc_pin, LOW);
+    SendCommand(0x22);
+    SendData(0xc3);
+    SendCommand(0x20);
+
     SendCommand(DEEP_SLEEP_MODE);
-    //WaitUntilIdle();
+    SendData(0x01);
+
+    WaitUntilIdle();
 }
 
 void EPD_WaveShare154::setTemperature(float temperature) {
