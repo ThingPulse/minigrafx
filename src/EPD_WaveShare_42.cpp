@@ -441,4 +441,5 @@ void EPD_WaveShare42::Sleep() {
     WaitUntilIdle();
     SendCommand(DEEP_SLEEP);         //deep sleep
     SendData(0xA5);
+    WaitUntilIdle();
 }
