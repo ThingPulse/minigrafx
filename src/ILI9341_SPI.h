@@ -28,12 +28,8 @@ Many thanks go to various contributors such as Adafruit, Waveshare.
 #ifndef _MINIGRAFX_ILI9341H_
 #define _MINIGRAFX_ILI9341H_
 
-#if ARDUINO >= 100
- #include "Arduino.h"
- #include "Print.h"
-#else
- #include "WProgram.h"
-#endif
+#include "Arduino.h"
+#include "Print.h"
 #include "DisplayDriver.h"
 #if defined (__AVR__)
   #include <avr/pgmspace.h>

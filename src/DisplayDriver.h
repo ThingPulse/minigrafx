@@ -28,13 +28,7 @@ Many thanks go to various contributors such as Adafruit, Waveshare.
 #ifndef _MINIGRAFX_DRIVER_H
 #define _MINIGRAFX_DRIVER_H
 
-#if ARDUINO >= 100
- #include "Arduino.h"
-
-#else
- #include "WProgram.h"
-#endif
-
+#include "Arduino.h"
 
 struct BufferInfo {
   // the frame buffer
