@@ -80,8 +80,10 @@ public:
     void DelayMs(unsigned int delaytime);
     void SpiTransfer(unsigned char data);
 
+
     void SendCommand(unsigned char command);
     void SendData(unsigned char data);
+    void SendBulkData(unsigned char* data, uint32_t size);
     void WaitUntilIdle(void);
     void Reset(void);
 

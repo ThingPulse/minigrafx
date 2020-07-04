@@ -60,7 +60,7 @@ void EPD_WaveShare154D67::setFastRefresh(boolean isFastRefreshEnabled) {
 void EPD_WaveShare154D67::writeBuffer(BufferInfo *bufferInfo) {
   writeBufferWithCommand(0x24, bufferInfo);
   DisplayFrame();
-  if (!isFastRefreshEnabled) {
+  if (!bufferInfo->isPartialUpdate) {
     writeBufferWithCommand(0x26, bufferInfo);
   }
 
@@ -96,6 +96,9 @@ void EPD_WaveShare154D67::writeBufferWithCommand(uint8_t command, BufferInfo *bu
 
   uint8_t data;
 
+  uint32_t ramLines = EPD_HEIGHT;
+  uint32_t bytesPerLine = EPD_WIDTH >> 3;
+  uint8_t lineBuffer[bytesPerLine];
 
   SetMemoryArea(xPos, yPos, xPos + targetWidth - 1, yPos + targetHeight - 1);
   SetMemoryPointer(xPos, yPos);
@@ -103,6 +106,7 @@ void EPD_WaveShare154D67::writeBufferWithCommand(uint8_t command, BufferInfo *bu
 
     
   SendCommand(command);
+  uint32_t counter = 0;
   /* send the image data */
   for (int i = 0; i < targetHeight; i++) {
       for (int j = 0; j < (targetWidth) / 8; j++) {
@@ -129,19 +133,19 @@ void EPD_WaveShare154D67::writeBufferWithCommand(uint8_t command, BufferInfo *bu
                 y = sourceHeight - (j * 8 + b) - 1;
                 break;
             }
-
+            counter++;
             //
             data = data | (getPixel(bufferInfo->buffer, bufferInfo->windowX + x, bufferInfo->windowY + y, sourceWidth, sourceHeight) & 1);
 
           }
+          lineBuffer[j] = data;
+          
 
-          SendData(data);
-          yield();
       }
-
+      SendBulkData(lineBuffer, bytesPerLine);
+      yield();
     }
     
-
 
 
 }
@@ -189,40 +193,21 @@ void EPD_WaveShare154D67::DelayMs(unsigned int delaytime) {
     delay(delaytime);
 }
 
-void EPD_WaveShare154D67::SpiTransfer(unsigned char data) {
-    digitalWrite(this->cs_pin, LOW);
-    SPI.transfer(data);
-    digitalWrite(this->cs_pin, HIGH);
-}
+
 
 int EPD_WaveShare154D67::Init() {
     /* this calls the peripheral hardware interface, see epdif */
     if (IfInit() != 0) {
         return -1;
     }
-
+    log_v("Time before HW reset: %d", millis());
     /* EPD hardware init start */
     Reset();
+    log_v("Time before SW reset: %d", millis());
     WaitUntilIdle();   
     SendCommand(0x12);  //SWRESET
     WaitUntilIdle();  
-    /*SendCommand(DRIVER_OUTPUT_CONTROL);
-    SendData((EPD_HEIGHT - 1) & 0xFF);
-    SendData(((EPD_HEIGHT - 1) >> 8) & 0xFF);
-    SendData(0x00);                     // GD = 0; SM = 0; TB = 0;
-    SendCommand(BOOSTER_SOFT_START_CONTROL);
-    SendData(0xD7);
-    SendData(0xD6);
-    SendData(0x9D);
-    SendCommand(WRITE_VCOM_REGISTER);
-    SendData(0x9A);                     // VCOM 7C
-    SendCommand(SET_DUMMY_LINE_PERIOD);
-    SendData(0x1A);                     // 4 dummy lines per gate
-    SendCommand(SET_GATE_TIME);
-    SendData(0x08);                     // 2us per line
-    SendCommand(DATA_ENTRY_MODE_SETTING);
-    SendData(0x03);                     // X increment; Y increment
-    SetLut(this->lut);*/
+    log_v("Time SW init : %d", millis());
     SendCommand(0x01); //Driver output control      
     SendData(0xC7);
     SendData(0x00);
@@ -242,7 +227,8 @@ int EPD_WaveShare154D67::Init() {
     SendData(0x00); 
 
     SendCommand(0x3C); //BorderWavefrom
-    SendData(0x01);  
+    //SendData(0x01);  
+    SendData(0x05);  
         
     SendCommand(0x18); 
     SendData(0x80);  
@@ -252,12 +238,15 @@ int EPD_WaveShare154D67::Init() {
     SendCommand(0x4F);   // set RAM y address count to 0X199;    
     SendData(0xC7);
     SendData(0x00);
+    log_v("Time after SW init: %d", millis());
     WaitUntilIdle(); 
+    log_v("Time after wait until idle: %d", millis());
     if (isInitialRefresh) {
       fillRam(0x24, 0x00);
       fillRam(0x26, 0x00);
       isInitialRefresh = false;
     }
+    log_v("Time end init: %d", millis());
     return 0;
 }
 
@@ -277,11 +266,24 @@ void EPD_WaveShare154D67::SendData(unsigned char data) {
     SpiTransfer(data);
 }
 
+void EPD_WaveShare154D67::SendBulkData(unsigned char* data, uint32_t size) {
+    DigitalWrite(dc_pin, HIGH); 
+    digitalWrite(this->cs_pin, LOW);
+    SPI.transfer(data, size);
+    digitalWrite(this->cs_pin, HIGH);
+}
+
+void EPD_WaveShare154D67::SpiTransfer(unsigned char data) {
+    digitalWrite(this->cs_pin, LOW);
+    SPI.transfer(data);
+    digitalWrite(this->cs_pin, HIGH);
+}
+
 /**
  *  @brief: Wait until the busy_pin goes LOW
  */
 void EPD_WaveShare154D67::WaitUntilIdle(void) {
-    Serial.println(F("Waiting for display idle"));
+    //Serial.println(F("Waiting for display idle"));
     unsigned long start = micros();
     while (1) {
       if (digitalRead(this->busy_pin) == LOW) {
@@ -293,7 +295,7 @@ void EPD_WaveShare154D67::WaitUntilIdle(void) {
         break;
       }
     }
-    Serial.println(F("Display ready"));
+    //Serial.println(F("Display ready"));
 }
 
 /**
@@ -363,9 +365,13 @@ void EPD_WaveShare154D67::SetMemoryPointer(int x, int y) {
 }
 
 void EPD_WaveShare154D67::fillRam(uint8_t command, uint8_t value) {
+  uint32_t ramLines = EPD_HEIGHT;
+  uint32_t bytesPerLine = EPD_WIDTH >> 3;
+  uint8_t lineBuffer[bytesPerLine] = {value};
   SendCommand(command);
-  for (int i = 0; i < EPD_WIDTH * EPD_HEIGHT; i++) {
-    SendData(value);
+
+  for (int i = 0; i < ramLines; i++) {
+    SendBulkData(lineBuffer, bytesPerLine);
   }
 }
 

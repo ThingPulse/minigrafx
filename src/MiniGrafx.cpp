@@ -590,6 +590,7 @@ void MiniGrafx::commit() {
   bufferInfo.windowY = 0;
   bufferInfo.windowWidth = this->width;
   bufferInfo.windowHeight = this->height;
+  bufferInfo.isPartialUpdate = false;
   this->driver->writeBuffer(&bufferInfo);
 }
 
@@ -606,6 +607,7 @@ void MiniGrafx::commit(uint16_t xPos, uint16_t yPos) {
   bufferInfo.windowY = 0;
   bufferInfo.windowWidth = this->width;
   bufferInfo.windowHeight = this->height;
+  bufferInfo.isPartialUpdate = true;
   this->driver->writeBuffer(&bufferInfo);
 }
 
@@ -622,6 +624,7 @@ void MiniGrafx::commit(uint16_t srcXPos, uint16_t srcYPos, uint16_t srcWidth, ui
   bufferInfo.windowY = srcXPos;
   bufferInfo.windowWidth = srcWidth;
   bufferInfo.windowHeight = srcHeight;
+  bufferInfo.isPartialUpdate = true;
   this->driver->writeBuffer(&bufferInfo);
 }
 
