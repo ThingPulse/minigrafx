@@ -53,7 +53,8 @@ struct BufferInfo {
   uint16_t bufferWidth;
   // height of the source buffer
   uint16_t bufferHeight;
-
+  // is this a partial update?
+  bool isPartialUpdate = false;
 };
 
 class DisplayDriver {
