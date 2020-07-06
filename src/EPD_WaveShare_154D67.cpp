@@ -305,9 +305,9 @@ void EPD_WaveShare154D67::WaitUntilIdle(void) {
  */
 void EPD_WaveShare154D67::Reset(void) {
     DigitalWrite(reset_pin, LOW);                //module reset
-    DelayMs(200);
-    DigitalWrite(reset_pin, HIGH);
-    DelayMs(200);
+    DelayMs(20);
+    pinMode(reset_pin, INPUT_PULLUP);
+    DelayMs(100);
 }
 
 /**
@@ -398,14 +398,17 @@ uint8_t EPD_WaveShare154D67::reverse(uint8_t in)
  *          You can use Epd::Init() to awaken
  */
 void EPD_WaveShare154D67::Sleep() {
+
     SendCommand(0x22);
-    SendData(0xc3);
+    SendData(0x83);
     SendCommand(0x20);
 
-    SendCommand(DEEP_SLEEP_MODE);
-    SendData(0x01);
-
     WaitUntilIdle();
+    //SendCommand(DEEP_SLEEP_MODE);
+    //SendData(0x01);
+
+    SendCommand(0x10); // deep sleep mode
+    SendData(0x1);     // enter deep sleep
 }
 
 void EPD_WaveShare154D67::setTemperature(float temperature) {
