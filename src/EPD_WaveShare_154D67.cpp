@@ -200,14 +200,14 @@ int EPD_WaveShare154D67::Init() {
     if (IfInit() != 0) {
         return -1;
     }
-    log_v("Time before HW reset: %d", millis());
+
     /* EPD hardware init start */
     Reset();
-    log_v("Time before SW reset: %d", millis());
+
     WaitUntilIdle();   
     SendCommand(0x12);  //SWRESET
     WaitUntilIdle();  
-    log_v("Time SW init : %d", millis());
+
     SendCommand(0x01); //Driver output control      
     SendData(0xC7);
     SendData(0x00);
@@ -238,15 +238,15 @@ int EPD_WaveShare154D67::Init() {
     SendCommand(0x4F);   // set RAM y address count to 0X199;    
     SendData(0xC7);
     SendData(0x00);
-    log_v("Time after SW init: %d", millis());
+
     WaitUntilIdle(); 
-    log_v("Time after wait until idle: %d", millis());
+
     if (isInitialRefresh) {
       fillRam(0x24, 0x00);
       fillRam(0x26, 0x00);
       isInitialRefresh = false;
     }
-    log_v("Time end init: %d", millis());
+
     return 0;
 }
 
@@ -367,7 +367,11 @@ void EPD_WaveShare154D67::SetMemoryPointer(int x, int y) {
 void EPD_WaveShare154D67::fillRam(uint8_t command, uint8_t value) {
   uint32_t ramLines = EPD_HEIGHT;
   uint32_t bytesPerLine = EPD_WIDTH >> 3;
-  uint8_t lineBuffer[bytesPerLine] = {value};
+  uint8_t lineBuffer[bytesPerLine];
+  for (uint16_t i = 0; i < bytesPerLine; i++) {
+    lineBuffer[i] = value;
+  }
+
   SendCommand(command);
 
   for (int i = 0; i < ramLines; i++) {
