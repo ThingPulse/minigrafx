@@ -471,7 +471,7 @@ uint16_t MiniGrafx::getStringWidth(const char* text, uint16_t length) {
   uint16_t maxWidth = 0;
 
   while (length--) {
-    stringWidth += readFontData(fontData, JUMPTABLE_START + (text[length] - firstChar) * JUMPTABLE_BYTES + JUMPTABLE_WIDTH);
+    stringWidth += readFontData(fontData, JUMPTABLE_START + ((reinterpret_cast<const unsigned char*>(text)[length]) - firstChar) * JUMPTABLE_BYTES + JUMPTABLE_WIDTH);
     if (text[length] == 10) {
       maxWidth = max(maxWidth, stringWidth);
       stringWidth = 0;
