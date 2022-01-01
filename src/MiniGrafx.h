@@ -75,11 +75,6 @@ enum BUFFER_COLOR_DEPTH {
   BIT_16 = 16
 };
 
-#undef max
-#define max(a,b) ((a)>(b)?(a):(b))
-#undef min
-#define min(a,b) ((a)<(b)?(a):(b))
-
 class MiniGrafx {
 
  public:
