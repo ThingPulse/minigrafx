@@ -33,9 +33,9 @@ Demo for the buffered graphics library. Renders a 3D cube
 #include "ILI9341_SPI.h" // Hardware-specific library
 #include "image.h"
 
-#define TFT_DC D2
-#define TFT_CS D1
-#define TFT_LED D8
+#define TFT_DC 4    // D2
+#define TFT_CS 5    // D1
+#define TFT_LED 15  // D8
 
 // defines the colors usable in the paletted 16 color frame buffer
 uint16_t palette[256];

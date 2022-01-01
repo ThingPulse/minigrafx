@@ -24,16 +24,16 @@
 
 // Arduino IO layout
 //const int Pin_TEMPERATURE = A0; // Temperature is handled by LM75 over I2C and not an analog pin
-const int Pin_PANEL_ON = D2;//5;
-const int Pin_BORDER = D4;//10;
-const int Pin_DISCHARGE = D1;//4;
+const int Pin_PANEL_ON = 4; // D2
+const int Pin_BORDER = 2;   // D4
+const int Pin_DISCHARGE = 5;// D1
 //const int Pin_PWM = 5;    // Not used by COG v2
-const int Pin_RESET = D0;//6;
-const int Pin_BUSY = D1;//7;
-const int Pin_EPD_CS = D3;
-const int Pin_FLASH_CS = D8;//9;
-const int Pin_SW2 = D8;//12;
-const int Pin_RED_LED = D8;//13;
+const int Pin_RESET = 16;   // D0
+const int Pin_BUSY = 5;     // D1
+const int Pin_EPD_CS = 0;   // D3
+const int Pin_FLASH_CS = 15;// D8
+const int Pin_SW2 = 15;     // D8
+const int Pin_RED_LED = 15; // D8
 
 
 // defines the colors usable in the paletted 16 color frame buffer

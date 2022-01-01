@@ -32,9 +32,9 @@ Demo for the buffered graphics library. Renders a 3D cube
 #include "MiniGrafx.h" // General graphic library
 #include "ILI9341_SPI.h" // Hardware-specific library
 
-#define TFT_DC D2
-#define TFT_CS D1
-#define TFT_LED D8
+#define TFT_DC 4    // D2
+#define TFT_CS 5    // D1
+#define TFT_LED 15  // D8
 
 // See https://blog.squix.org/2015/05/esp8266-nodemcu-how-to-create-xbm.html
 // about how to create a XBM array

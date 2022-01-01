@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ThingPulse/minigrafx.svg?branch=master)](https://travis-ci.org/ThingPulse/minigrafx)
+[![PlatformIO CI](https://github.com/ThingPulse/minigrafx/actions/workflows/main.yml/badge.svg)](https://github.com/ThingPulse/minigrafx/actions/workflows/main.yml)
 
 # ThingPulse MiniGrafx Library
 
