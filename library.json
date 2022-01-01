@@ -1,6 +1,6 @@
 {
   "name": "Mini Grafx",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "keywords": "embedded, graphics, tft, oled, e-paper",
   "description": "A generic graphics library containing several drivers for TFT, OLED and e-paper displays",
   "repository":
@@ -12,7 +12,7 @@
   [
     {
         "name": "Daniel Eichhorn",
-        "email": "squix78@gmail.com",
+        "email": "dani@thingpulse.com",
         "url": "https://www.thingpulse.com"
     }
   ],
